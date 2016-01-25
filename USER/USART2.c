@@ -349,7 +349,7 @@ static void CommandProcess(void)
 	case MYYAW:
 		/*ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
 		ack_frame[1] = ((s16)(yaw *10)) & 0xFF;*/
-		sprintf(ack_frame,"%s","  yaw = ");
+		/*sprintf(ack_frame,"%s","  yaw = ");
 		USART2WriteDataToBuffer(ack_frame, 8);
 		sprintf(ack_frame,"%f",yaw);
 		USART2WriteDataToBuffer(ack_frame, 7);
@@ -362,7 +362,7 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%s","  roll = ");
 		USART2WriteDataToBuffer(ack_frame, 9);
 		sprintf(ack_frame,"%f",roll);
-		USART2WriteDataToBuffer(ack_frame, 7);
+		USART2WriteDataToBuffer(ack_frame, 7);*/
 	
 		/*sprintf(ack_frame,"%s","  kp = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
@@ -384,7 +384,7 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%f",interval);
 		USART2WriteDataToBuffer(ack_frame, 7);*/
 		
-		/*sprintf(ack_frame,"%s","  ex = ");
+		sprintf(ack_frame,"%s","  ex = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
 		sprintf(ack_frame,"%f",ex);
 		USART2WriteDataToBuffer(ack_frame, 7);
@@ -402,7 +402,7 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%s","  time = ");
 		USART2WriteDataToBuffer(ack_frame, 15);
 		sprintf(ack_frame,"%f",interval);
-		USART2WriteDataToBuffer(ack_frame, 7);*/
+		USART2WriteDataToBuffer(ack_frame, 7);
 		
 		sprintf(ack_frame,"%s","\r\n");
 		USART2WriteDataToBuffer(ack_frame, 2);
@@ -446,11 +446,11 @@ static void CommandProcess(void)
 		break;
 	case PID_ADJUST:
 		value = USART2RecvBuffer[USART2RecvBufStart + 1];
-		yaw_pid.kp = (float)(value / 100.0);
+		yaw_pid.kp = (float)(value / 10.0);
 		value = USART2RecvBuffer[USART2RecvBufStart + 2];
-		yaw_pid.ki = (float)(value / 1000.0);
+		yaw_pid.ki = (float)(value / 10.0);
 		value = USART2RecvBuffer[USART2RecvBufStart + 3];
-		yaw_pid.kd = (float)(value / 1000.0);
+		yaw_pid.kd = (float)(value / 10.0);
 		break;
 	case AHRSPID:
 		value = USART2RecvBuffer[USART2RecvBufStart + 1];

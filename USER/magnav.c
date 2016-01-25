@@ -60,8 +60,8 @@ void mag_sensor_init(void)
 	pd[PID_RIGHT].kp = 0.06;
 	pd[PID_RIGHT].kd = 0.03;
 
-	yaw_pid.kp = 0.05;
-	yaw_pid.ki = 0.00;
+	yaw_pid.kp = 0.06;
+	yaw_pid.ki = 0.005;
 	yaw_pid.kd = 0.00;
 	
 	error = 0;
@@ -90,7 +90,7 @@ void pid_cal(K_PD pd_temp, RobotRate *rate, u8 dir, float speed)
 		i_error = 0.0;
 	}
 	error = yaw - hold_yaw;
-	if((error < 0.5) && (error > -0.5))
+	if((error < 0.3) && (error > -0.3))
 	{
 		error = 0.0;
 	}
