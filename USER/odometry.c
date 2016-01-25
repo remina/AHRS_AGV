@@ -8,7 +8,7 @@ WheelSpeed feedback_wheelspeed;
 
 RobotRate g_robotrate;
 u32 g_distance = 0;
-void odometers(void)
+/*void odometers(void)
 {
     WheelSpeed wheelspeed;
 
@@ -24,5 +24,5 @@ void odometers(void)
 	ComputeBaseSpeed(wheelspeed, &g_robotrate);	
 	
 	g_distance += sqrt(pow(g_robotrate.fBotTranslationRateX * 0.05, 2) + pow(g_robotrate.fBotTranslationRateY * 0.05, 2));		
-}
+}*/
 

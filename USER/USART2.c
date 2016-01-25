@@ -14,6 +14,7 @@
 #include "odometry.h"
 #include "AHRS.h"
 #include "sensors.h"
+#include "magnav.h"
 
 u8 USART2SendQBoxHost;						//发送内存块头指针							
 u8 USART2SendQBoxTail;						//发送内存块尾指针
@@ -42,16 +43,21 @@ OSMEMTcb* OSQUSART2Index;
 //宏定义
 #define NO_START_RCV         0
 #define START_RCV            1
-#define FIRST_FRAMEHEADER    0x55
-#define SENCOND_FRAMEHEADER  0xAA
-#define	BUTCONMODE    0xA1
-#define	DISCONMODE    0xA2
-#define	COORDCONMODE  0xA3
-#define	DEMOMODE      0xA4
-#define	MY_ADDR       0x1E
-#define	MYYAW					0x1A
-#define	TEST					0x1B
+#define FIRST_FRAMEHEADER	0x55
+#define SENCOND_FRAMEHEADER	0xAA
+#define	BUTCONMODE			0xA1
+#define	DISCONMODE			0xA2
+#define	COORDCONMODE		0xA3
+#define	DEMOMODE			0xA4
+#define	MY_ADDR				0x1E
+#define	MYYAW				0x1A
+#define	TEST				0x1B
 #define STOP_TEST			0x1C
+#define MOVE_ALL			0x1D
+#define STOP_MOVE_ALL		0x1E
+#define MOVE_TARGET			0x20
+#define STOP_MOVE_TARGET	0x21
+#define PID_ADJUST			0x30
 int ucTranslateRate[3], ucAngle[3], ucRotateRate[3];
 u8  rateIndex = 0;
 
@@ -253,9 +259,13 @@ static void CommandProcess(void)
 //	int ucTranslateRate, ucAngle, ucRotateRate;
 //	static u8 sensorflag = OPENSENSOR; 
 	u8 ucCommand, j, value;
+	s16 long_value;
 	RobotRate	robotrate;
 	extern u8 g_dir;
 	extern u8 test_flag;
+	extern u8 move_all_flag;
+	extern u8 move_target_flag;
+	extern K_PD yaw_pid;
 	u8 ack_frame[8];
 
 //	WheelSpeed  realspeed;
@@ -366,6 +376,41 @@ static void CommandProcess(void)
 		stop_base();
 		test_flag = 0;
 		g_bt_manual_botrate = 0;
+		break;
+	case MOVE_ALL:
+		value = USART2RecvBuffer[USART2RecvBufStart + 1];
+		g_bt_manual_botrate = (float)(PI * value / 180.0);
+		if(g_bt_manual_botrate >= 0.6) 
+		g_bt_manual_botrate = 0.6;	 // limit
+		else if(g_bt_manual_botrate <= -0.6) 
+		g_bt_manual_botrate = -0.6;
+		move_all_flag = 1;
+		break;
+	case STOP_MOVE_ALL:
+		stop_base();
+		move_all_flag = 0;
+		g_bt_manual_botrate = 0;
+		break;
+	case MOVE_TARGET:
+		move_target_flag = 1;
+		g_bt_manual_flag = TRUE;
+		long_value = ((USART2RecvBuffer[USART2RecvBufStart + 1]) << 8) | (USART2RecvBuffer[USART2RecvBufStart + 2]);
+		hold_yaw = (float)(long_value / 10.0);
+		g_bt_manual_botrate = 0.0;
+		break;
+	case STOP_MOVE_TARGET:
+		move_target_flag = 0;
+		stop_base();
+		g_bt_manual_botrate = 0.0;
+		g_bt_manual_flag = FALSE;
+		break;
+	case PID_ADJUST:
+		value = USART2RecvBuffer[USART2RecvBufStart + 1];
+		yaw_pid.kp = (float)(value / 100.0);
+		value = USART2RecvBuffer[USART2RecvBufStart + 2];
+		yaw_pid.ki = (float)(value / 100.0);
+		value = USART2RecvBuffer[USART2RecvBufStart + 3];
+		yaw_pid.kd = (float)(value / 100.0);	
 		break;
 // case SONARVAL:
 //      j = (UART4RecvBufStart + 1) & (MAX_RCV_BYTES - 1);

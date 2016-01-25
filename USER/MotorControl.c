@@ -133,7 +133,7 @@ void HandleMotorMessage(int ID, int speedrate, int dir, int flag)
 	CAN1WriteDataToBuffer(CANdata, 8, ID, CAN_RTR_DATA);
 }
 
-void set_speedctl(u8 motor_id) 
+/*void set_speedctl(u8 motor_id) 
 {
 	u32 id = BUILD_ID(0, motor_id, 768);
 	u8 data[8];
@@ -147,9 +147,9 @@ void set_speedctl(u8 motor_id)
 	id = BUILD_ID(0, motor_id, 768);
 	*((u32*)data) = 1;
 	CAN1WriteDataToBuffer(data, 4, id, CAN_RTR_DATA);
-}
+}*/
 
-void set_posctl(u8 motor_id)
+/*void set_posctl(u8 motor_id)
 {
     u32 id = BUILD_ID(0, motor_id, 768);
 	u8 data[8];
@@ -163,49 +163,54 @@ void set_posctl(u8 motor_id)
 	id = BUILD_ID(0, motor_id, 768);
 	*((u32*)data) = 1;
 	CAN1WriteDataToBuffer(data, 4, id, CAN_RTR_DATA);
-}
+}*/
 
-void set_all_speedctl(void)
+/*void set_all_speedctl(void)
 {
-	set_speedctl(1);
-	set_speedctl(2);
-	set_speedctl(3);
-	set_speedctl(4);
-}
+	set_speedctl(30);
+	set_speedctl(20);
+	set_speedctl(23);
+	set_speedctl(26);
+}*/
 
-void set_all_posctl(void)
+/*void set_all_posctl(void)
 {
-	set_posctl(1);
+	set_posctl(30);
 	DelayMs(10);
-	set_posctl(2);
+	set_posctl(20);
 	DelayMs(10);
-	set_posctl(3);
+	set_posctl(23);
 	DelayMs(10);
-	set_posctl(4);
-}
+	set_posctl(26);
+}*/
 
 
 void set_motorspeed(u8 motor_id, s32 speed)
 {
-	u32 id;
+	/*u32 id;
 	u8 data[4];
     id = BUILD_ID(0, motor_id, 773);
-//	if (speed >= 187500)
-//		speed = 187500;
-//	if (speed <= -187500)
-//		speed = -187500;
 	*((s32*)data) = speed;
-	CAN1WriteDataToBuffer(data, 4, id, CAN_RTR_DATA);
+	CAN1WriteDataToBuffer(data, 4, id, CAN_RTR_DATA);*/
+	u32 id;
+	u8 data[8];
+	id = BUILD_ID(0, motor_id, 773);
+	data[0] = 8;
+	data[1] = motor_id;
+	data[2] = 0x90;//
+	data[3] = 0;
+	*((s32*)(data+4)) = speed;
+	CAN1WriteDataToBuffer(data, 8, motor_id, CAN_RTR_DATA);
 }
 
-void set_motorpos(u8 motor_id, int64_t pos)
+/*void set_motorpos(u8 motor_id, int64_t pos)
 {
 	u32 id;
 	u8 data[8];
 	id = BUILD_ID(0, motor_id, 772);
 	*((int64_t*)data) = pos;
 	CAN1WriteDataToBuffer(data, 8, id, CAN_RTR_DATA);
-}
+}*/
 
 
 //
@@ -247,7 +252,7 @@ typedef struct {
 //
 
 
-void get_motorspeed(u8 motor_id)
+/*void get_motorspeed(u8 motor_id)
 {
 //	CAN_msg msg;
 //	msg.id = BUILD_ID(0, motor_id, 1036);
@@ -265,8 +270,8 @@ void get_motorspeed(u8 motor_id)
 	*((u32*)data) = 0;
 	CAN1WriteDataToBuffer(data, 4, id, CAN_RTR_Remote); 	
 }
-
-void get_motorpos(u8 motor_id)
+*/
+/*void get_motorpos(u8 motor_id)
 {
 //	CAN_msg msg;
 //	msg.id = BUILD_ID();
@@ -279,17 +284,17 @@ void get_motorpos(u8 motor_id)
 
 	CANSendMessage(&msg);
 		
-}
+}*/
 
-void move(s32 milemeter)
+/*void move(s32 milemeter)
 {
 //	set_all_posctl();
 //	DelayMs(10);
-	set_motorpos(1, 400000);
-	set_motorpos(2, -400000);
-	set_motorpos(3, 400000);
-	set_motorpos(4, -400000);	
-}
+	set_motorpos(30, 400000);
+	set_motorpos(20, -400000);
+	set_motorpos(23, 400000);
+	set_motorpos(26, -400000);	
+}*/
 
 void turn(u32 time)
 {
@@ -307,10 +312,10 @@ void turn(u32 time)
 
 void stop_base(void)
 {
-	set_motorspeed(1, 0);
-	set_motorspeed(2, 0);
-	set_motorspeed(3, 0);
-	set_motorspeed(4, 0);
+	set_motorspeed(30, 0);
+	set_motorspeed(20, 0);
+	set_motorspeed(23, 0);
+	set_motorspeed(26, 0);
 }
 
 //

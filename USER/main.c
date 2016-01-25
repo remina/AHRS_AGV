@@ -84,7 +84,7 @@ int main(void)
 
     DelayMs(1000);	   //Time for Motor Driver Board to init
 
-	set_all_speedctl();
+	//set_all_speedctl();
 	t3 = micros();
 	//*************************initial sensor***************************************************************//
 	while(t < 0x15)

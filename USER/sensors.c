@@ -40,6 +40,8 @@ LAYER **p_amp;                // pointer to amp priority list
 int amp_size;                 // number of tasks in priority list
 
 u8 test_flag = 0;
+u8 move_all_flag = 0;
+u8 move_target_flag = 0;
 
 u8 arbitrate; //global flag to enable subsumption
 u8 halt;      //global flag to halt robot
@@ -97,6 +99,14 @@ void bluetooth_task(void)
 		bluetooth_manual.robotrate.fBotTranslationRateX = g_bt_manual_botrate;
 		bluetooth_manual.robotrate.fBotTranslationRateY = 0;
 		bluetooth_manual.robotrate.fBotAngularRate = 0.0;
+		bluetooth_manual.flag = TRUE;
+	}
+	else if(move_all_flag)
+	{
+		bluetooth_manual.cmd  = ALLDIR;
+		bluetooth_manual.robotrate.fBotTranslationRateX = 0;
+		bluetooth_manual.robotrate.fBotTranslationRateY = 0;
+		bluetooth_manual.robotrate.fBotAngularRate = g_bt_manual_botrate;
 		bluetooth_manual.flag = TRUE;
 	}
 	else if(g_bt_manual_flag)

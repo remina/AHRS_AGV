@@ -17,6 +17,7 @@ K_PD g_pd[4];
 K_PD pd[4];
 u8 g_pd_flag;
 float error, error_p;
+K_PD yaw_pid;
 
 void mag_sensor_init(void)
 {
@@ -58,13 +59,18 @@ void mag_sensor_init(void)
 	pd[PID_LEFT].kd = -0.03;
 	pd[PID_RIGHT].kp = 0.06;
 	pd[PID_RIGHT].kd = 0.03;
+
+	yaw_pid.kp = 0.06;
+	yaw_pid.ki = 0.01;
+	yaw_pid.kd = 0.03;
+	
 	error = 0;
 	error_p = 0;
 }
 
 u8 last_dir=0;
 
-void pid_cal(K_PD pd, RobotRate *rate, u8 dir, float speed)
+void pid_cal(K_PD pd_temp, RobotRate *rate, u8 dir, float speed)
 {
 
 //	float angluar_rate;
@@ -83,19 +89,27 @@ void pid_cal(K_PD pd, RobotRate *rate, u8 dir, float speed)
 		error_p = 0.0;
 		i_error = 0.0;
 	}
-	error = yaw - hold_yaw;
-	i_error += pd.ki*error;
+	error = hold_yaw - yaw;
+	if((error < 0.3) && (error > -0.3))
+	{
+		error = 0.0;
+	}
+	i_error += pd_temp.ki*error;
 	d_error = error - error_p;
-	rate->fBotAngularRate = (pd.kp*error + i_error + pd.kd*d_error);	//direction control
+	rate->fBotAngularRate = (pd_temp.kp*error + i_error + pd_temp.kd*d_error);	//direction control
 	
 
-	if(rate->fBotAngularRate>=0.6)
+	if(rate->fBotAngularRate >= 0.6)
 	{
-		rate->fBotAngularRate=0.6;	 // limit
+		rate->fBotAngularRate = 0.6;	 // limit
 	}
-	else if(rate->fBotAngularRate<=-0.6)
+	else if(rate->fBotAngularRate <= -0.6)
 	{
-		rate->fBotAngularRate=-0.6;
+		rate->fBotAngularRate = -0.6;
+	}
+	if((rate->fBotAngularRate <= 0.01) && (rate->fBotAngularRate >= -0.01))
+	{
+		rate->fBotAngularRate = 0.0;	 // limit
 	}
 	error_p = error;
 	hold_yaw_p = hold_yaw;	
@@ -103,6 +117,7 @@ void pid_cal(K_PD pd, RobotRate *rate, u8 dir, float speed)
 
 RobotRate mag_nav(u8 nav_dir, float speed)
 {
+	extern u8 move_target_flag;
 	K_PD s_pd;
 	RobotRate rate;
 	WheelSpeed wheelspeed;
@@ -125,31 +140,27 @@ RobotRate mag_nav(u8 nav_dir, float speed)
 
 		rate.fBotTranslationRateX = speed;
 		rate.fBotTranslationRateY = 0;
-//		pid_cal(pd, &rate, nav_dir);
 		break;
 	case BACK:
 		s_pd = pd[PID_BACK];
 		rate.fBotTranslationRateX = -speed;
 		rate.fBotTranslationRateY = 0;
-//		pid_cal(pd, &rate, nav_dir);
 		break;
 	case LEFT:
 		s_pd = pd[PID_LEFT];
 		rate.fBotTranslationRateX = 0;
 		rate.fBotTranslationRateY = speed;
-//		pid_cal(pd, &rate, nav_dir);
 		break;
 	case RIGHT:
 		s_pd = pd[PID_RIGHT];
 		rate.fBotTranslationRateX = 0;
 		rate.fBotTranslationRateY = -speed;
-//		pid_cal(s_pd, &rate, FRONT); 
 		break;
 	default:
 		break;
 	}
-	if (abs((int)speed) != 0)
-        pid_cal(s_pd, &rate, nav_dir, speed);
+	if((abs((int)speed) != 0) || (move_target_flag))
+        pid_cal(yaw_pid, &rate, nav_dir, speed);
 	else																												   
 		rate.fBotAngularRate = 0.0;
 

@@ -17,10 +17,10 @@ TIME2：中断优先级别为0，响应级别为5
 typedef signed long long s64;  
 
 #define	GPID 0x0121
-#define LF_MOTOR_ID 1
-#define RF_MOTOR_ID 2
-#define LB_MOTOR_ID 3
-#define RB_MOTOR_ID 4
+#define LF_MOTOR_ID 30
+#define RF_MOTOR_ID 20
+#define LB_MOTOR_ID 23
+#define RB_MOTOR_ID 26
 #define LL_MOTOR_ID 0x0125
 #define RL_MOTOR_ID 0x0126
 

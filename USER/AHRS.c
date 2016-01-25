@@ -19,7 +19,7 @@ float b_x = -1.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
 
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
-float twoKp = 0.06f, twoKi = 0.0006f;
+float twoKp_z = 0.18f, twoKp_x = 0.09, twoKp_y = 0.095, twoKi_z = 0.006f, twoKi_x = 0.0003, twoKi_y = 0.0003;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
 
 float roll_m = 0.0f, pitch_m = 0.0f, yaw_m = 0.0f;
@@ -151,20 +151,7 @@ void SensorDataProcess(u8 type)
 	switch(type)
 	{
 		case 0x52:
-		{
-			/*i = UART4RecvBufStart + 3;
-			gyro_x_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 2;
-			gyro_x_raw += UART4RecvBuffer[i];
-			i = UART4RecvBufStart + 5;
-			gyro_y_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 4;
-			gyro_y_raw += UART4RecvBuffer[i];
-			i = UART4RecvBufStart + 7;
-			gyro_z_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 8;
-			gyro_z_raw += UART4RecvBuffer[i];*/
-						
+		{					
 			gyro_x_raw = rawdata[3] << 8;
 			gyro_x_raw += rawdata[2];
 			gyro_y_raw = rawdata[5] << 8;
@@ -172,33 +159,18 @@ void SensorDataProcess(u8 type)
 			gyro_z_raw = rawdata[7] << 8;
 			gyro_z_raw += rawdata[6];
 			
-			//gyro_x_raw = (float)gyro_x_raw;
-			//gyro_y_raw = (float)gyro_y_raw;
-			//gyro_z_raw = (float)gyro_z_raw;
-			
 			//turn degreen into rad
-			w_x = 110.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_y = 135.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -120.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_x = 20.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_y = 20.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -141.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			if(fabs(w_x) < 0.2) w_x = 0.0f;
 			if(fabs(w_y) < 0.2) w_y = 0.0f;
 			if(fabs(w_z) < 0.2) w_z = 0.0f;
+
 			break;
 		}
 		case 0x51:
 		{		
-      /*i = UART4RecvBufStart + 3;
-			acc_x_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 2;
-			acc_x_raw += UART4RecvBuffer[i];
-			i = UART4RecvBufStart + 5;
-			acc_y_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 4;
-			acc_y_raw += UART4RecvBuffer[i];
-			i = UART4RecvBufStart + 7;
-			acc_z_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 8;
-			acc_z_raw += UART4RecvBuffer[i];*/
 			
 			acc_x_raw = rawdata[3] << 8;
 			acc_x_raw += rawdata[2];
@@ -206,10 +178,6 @@ void SensorDataProcess(u8 type)
 			acc_y_raw += rawdata[4];
 			acc_z_raw = rawdata[7] << 8;
 			acc_z_raw += rawdata[6];
-			
-			//acc_x_raw = (float)acc_x_raw;
-			//acc_y_raw = (float)acc_y_raw;
-			//acc_z_raw = (float)acc_z_raw;
 			
 			//turn into g
 			a_x = -1.0f * acc_x_raw / 32768.0 * 16.0 ;
@@ -219,29 +187,13 @@ void SensorDataProcess(u8 type)
 		}
 		case 0x54:
 		{
-			/*i = UART4RecvBufStart + 3;
-			mag_x_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 2;
-			mag_x_raw += UART4RecvBuffer[i];
-			i = UART4RecvBufStart + 5;
-			mag_y_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 4;
-			mag_y_raw += UART4RecvBuffer[i];
-			i = UART4RecvBufStart + 7;
-			mag_z_raw = UART4RecvBuffer[i] << 8;
-			i = UART4RecvBufStart + 8;
-			mag_z_raw += UART4RecvBuffer[i];*/
-			
+		
 			mag_x_raw = rawdata[3] << 8;
 			mag_x_raw += rawdata[2];
 			mag_y_raw = rawdata[5] << 8;
 			mag_y_raw += rawdata[4];
 			mag_z_raw = rawdata[7] << 8;
-			mag_z_raw += rawdata[6];
-
-			//mag_x_raw = (float)mag_x_raw;
-			//mag_y_raw = (float)mag_y_raw;
-			//mag_z_raw = (float)mag_z_raw;			
+			mag_z_raw += rawdata[6];		
 			
 			m_x = -1.0f * mag_x_raw;
 			m_y = mag_y_raw;
@@ -438,7 +390,7 @@ void SensorInitial(u8 type)
 void AHRS_iteration(u8 type)
 {
 	//*******************************???¡¥¡ä¡ã?¨²??2¡§*******************************************************//
-	u8 j = 0;
+	u8 j = 0, k = 0;
 	float norm = 0.0f, sum = 0.0f;
 	u8 flag = type;
 	float q0q0 = 0.0, q0q1 = 0.0, q0q2 = 0.0, q0q3 = 0.0, q1q1 = 0.0, q1q2 = 0.0, 
@@ -468,7 +420,10 @@ void AHRS_iteration(u8 type)
 		{
 			sum += buffer1[j];
 		}
-		gyro_x = (sum / 6.0f) - w_x_bias;
+		gyro_x = fabs(fabs(sum / 6.0f) - fabs(w_x_bias));
+		if(sum < 0) gyro_x = -gyro_x;
+		//gyro_x = (sum / 6.0f) - w_x_bias * 0.5;
+		//gyro_x = sum / 6.0f;
 		//low_pass filter
 		/*gyro_x = gyro_x * 0.7 + gyro_x_0 * 0.3;
 		gyro_x_0 = gyro_x;*/
@@ -478,7 +433,10 @@ void AHRS_iteration(u8 type)
 		{
 			sum += buffer2[j];
 		}
-		gyro_y = (sum / 6.0f) - w_y_bias;
+		gyro_y = fabs(fabs(sum / 6.0f) - fabs(w_y_bias));
+		if(sum < 0) gyro_y = -gyro_y;
+		//gyro_y = (sum / 6.0f) - w_y_bias * 0.5;
+		//gyro_y = sum / 6.0f;
 		/*gyro_y = gyro_y * 0.7 + gyro_y_0 * 0.3;
 		gyro_y_0 = gyro_y;*/
 		sum = 0;
@@ -487,7 +445,10 @@ void AHRS_iteration(u8 type)
 		{
 			sum += buffer3[j];
 		}
-		gyro_z = (sum / 6.0f) - w_z_bias;
+		gyro_z = fabs(fabs(sum / 6.0f) - fabs(w_z_bias));
+		if(sum < 0) gyro_z = -gyro_z;
+		//gyro_z = (sum / 6.0f) - w_z_bias * 0.5;
+		//gyro_z = sum / 6.0f;
 		/*gyro_z = gyro_z * 0.7 + gyro_z_0 * 0.3;
 		gyro_z_0 = gyro_z;*/
 		sum = 0;
@@ -582,7 +543,7 @@ void AHRS_iteration(u8 type)
 		//maybe ex,ey,ex is in degreen ,which should be turn into rads(since ex,ey,ez is much too huge, making w_x,w_y,w_z turnning all the time	)
 		ex = (acc_y * vz - acc_z * vy) + (mag_y * wz - mag_z * wy);
 		ey = (acc_z * vx - acc_x * vz) + (mag_z * wx - mag_x * wz);
-		ez = (acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx);
+		ez = ((acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx)) * 0.2;
 		/*ex = 0.0;
 		ey = 0.0;
 		ez = 0.0;*/
@@ -593,11 +554,11 @@ void AHRS_iteration(u8 type)
 		if(fabs(ez) < (PI / 360.0)){ez = 0.0f;}
 	
 		// Compute and apply integral feedback if enabled(¨®?2?3??¨®2?PIDT?y¨ª¨®?Y¨°?)
-		if(ex != 0.0f && ey != 0.0f && ez != 0.0f && twoKi > 0.0f) 
+		if(ex != 0.0f && ey != 0.0f && ez != 0.0f) 
 		{
-			integralFb_x += twoKi * ex ;	// integral error scaled by Ki
-			integralFb_y += twoKi * ey ;
-			integralFb_z += twoKi * ez ;
+			integralFb_x += twoKi_x * ex ;	// integral error scaled by Ki
+			integralFb_y += twoKi_y * ey ;
+			integralFb_z += twoKi_z * ez ;
 		
 			gyro_x += integralFb_x;	// apply integral feedback
 			gyro_y += integralFb_y;
@@ -611,9 +572,9 @@ void AHRS_iteration(u8 type)
 		}
 
 		// Apply proportional feedback
-		gyro_x += twoKp * ex;
-		gyro_y += twoKp * ey;
-		gyro_z += twoKp * ez;
+		gyro_x += twoKp_x * ex;
+		gyro_y += twoKp_y * ey;
+		gyro_z += twoKp_z * ez;
 	
 		gyro_x_f = gyro_x;
 		gyro_y_f = gyro_y;

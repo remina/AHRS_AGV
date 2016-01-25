@@ -13,7 +13,7 @@
 #include "global.h"
 #include "stm32f10x.h"
 
-#define CON_COEFEICIENT  626.912
+#define CON_COEFEICIENT  1	//626.912
 
 typedef struct{
 float fBotTranslationRateX;

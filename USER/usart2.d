@@ -43,3 +43,4 @@ usart2.o: USART1.h
 usart2.o: USART1Config.h
 usart2.o: USART1.h
 usart2.o: sensors.h
+usart2.o: magnav.h

@@ -18,6 +18,8 @@
 
 #define total                2147483648      //32bit timer's total count
 
+#define sign(x)              (x > 0?1:-1)
+
 extern float yaw;
 extern float pitch;
 extern float roll;
