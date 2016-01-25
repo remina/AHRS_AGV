@@ -271,20 +271,14 @@ static void CommandProcess(void)
 	extern K_PD yaw_pid;
 	extern float twoKp_z;
 	extern float twoKi_z;
-	extern float twoKd_z;
 	extern float twoKp_x;
 	extern float twoKi_x;
-	extern float twoKd_x;
 	extern float twoKp_y;
 	extern float twoKi_y;
-	extern float twoKd_y;
 	extern float interval;
 	extern float ex;
 	extern float ey;
 	extern float ez;	
-	extern float magz;
-	extern float magy;
-	extern float magx;
 	u8 ack_frame[8];
 
 //	WheelSpeed  realspeed;
@@ -351,37 +345,23 @@ static void CommandProcess(void)
 //		sensorflag = CLOSESENSOR;
 		break;
 	case MYYAW:
-		/*ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
+/*ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
 		ack_frame[1] = ((s16)(yaw *10)) & 0xFF;*/
-		/*sprintf(ack_frame,"%s","  yaw = ");
-		USART2WriteDataToBuffer(ack_frame, 8);
+		sprintf(ack_frame,"%s"," yaw=");
+		USART2WriteDataToBuffer(ack_frame, 5);
 		sprintf(ack_frame,"%f",yaw);
 		USART2WriteDataToBuffer(ack_frame, 7);
 	
-		sprintf(ack_frame,"%s","  pitch = ");
-		USART2WriteDataToBuffer(ack_frame, 10);
+		sprintf(ack_frame,"%s"," pitch=");
+		USART2WriteDataToBuffer(ack_frame, 7);
 		sprintf(ack_frame,"%f",pitch);
 		USART2WriteDataToBuffer(ack_frame, 7);
 	
-		sprintf(ack_frame,"%s","  roll = ");
-		USART2WriteDataToBuffer(ack_frame, 9);
+		sprintf(ack_frame,"%s"," roll=");
+		USART2WriteDataToBuffer(ack_frame, 6);
 		sprintf(ack_frame,"%f",roll);
-		USART2WriteDataToBuffer(ack_frame, 7);*/
-
-		sprintf(ack_frame,"%s","  mag_x = ");
-		USART2WriteDataToBuffer(ack_frame, 10);
-		sprintf(ack_frame,"%f",magx);
 		USART2WriteDataToBuffer(ack_frame, 7);
 	
-		sprintf(ack_frame,"%s","  mag_y = ");
-		USART2WriteDataToBuffer(ack_frame, 10);
-		sprintf(ack_frame,"%f",magy);
-		USART2WriteDataToBuffer(ack_frame, 7);
-	
-		sprintf(ack_frame,"%s","  mag_z = ");
-		USART2WriteDataToBuffer(ack_frame, 10);
-		sprintf(ack_frame,"%f",magz);
-		USART2WriteDataToBuffer(ack_frame, 7);
 		/*sprintf(ack_frame,"%s","  kp = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
 		sprintf(ack_frame,"%f",twoKp_z);
@@ -415,12 +395,12 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%s","  ez = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
 		sprintf(ack_frame,"%f",ez);
-		USART2WriteDataToBuffer(ack_frame, 7);
-
-		sprintf(ack_frame,"%s","  time = ");
-		USART2WriteDataToBuffer(ack_frame, 15);
-		sprintf(ack_frame,"%f",interval);
 		USART2WriteDataToBuffer(ack_frame, 7);*/
+
+		sprintf(ack_frame,"%s"," t=");
+		USART2WriteDataToBuffer(ack_frame, 3);
+		sprintf(ack_frame,"%f",interval);
+		USART2WriteDataToBuffer(ack_frame, 8);
 		
 		sprintf(ack_frame,"%s","\r\n");
 		USART2WriteDataToBuffer(ack_frame, 2);
@@ -480,9 +460,6 @@ static void CommandProcess(void)
 		twoKi_x = twoKi_z; 
 		twoKi_y = twoKi_z;
 		value = USART2RecvBuffer[USART2RecvBufStart + 3];
-		twoKd_x = (float)(value / 10.0);
-		twoKd_y = twoKd_x; 
-		twoKd_z = twoKd_x;
 	case MOVE_STEP:
 		move_target_flag = 1;
 		g_bt_manual_flag = TRUE;

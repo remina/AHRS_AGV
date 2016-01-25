@@ -143,7 +143,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>/</Name>
+          <Name></Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -155,34 +155,50 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>499</LineNumber>
+          <LineNumber>584</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134238602</Address>
+          <Address>134240884</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\Users\Administrator\Desktop\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫(1229录脫脠毛mag赂么脌毛脨脼脮媒gyro_z卤露脢媒拢卢脨脼脮媒pid虏脦脢媒拢卢脥锚鲁脡脛驴卤锚脨媒脳陋pid碌梅脨拢)\USER\AHRS.c</Filename>
+          <Filename>G:\脣芦脗脰虏卯露炉\STM32鲁脤脨貌\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆拢篓16.01.14拢漏\USER\AHRS.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32_DEMO\AHRS.c\499</Expression>
+          <Expression>\\STM32_DEMO\AHRS.c\584</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>489</LineNumber>
+          <LineNumber>580</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134238500</Address>
+          <Address>134240586</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\Users\Administrator\Desktop\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫(1229录脫脠毛mag赂么脌毛脨脼脮媒gyro_z卤露脢媒拢卢脨脼脮媒pid虏脦脢媒拢卢脥锚鲁脡脛驴卤锚脨媒脳陋pid碌梅脨拢)\USER\AHRS.c</Filename>
+          <Filename>G:\脣芦脗脰虏卯露炉\STM32鲁脤脨貌\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆拢篓16.01.14拢漏\USER\AHRS.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\STM32_DEMO\AHRS.c\489</Expression>
+          <Expression>\\STM32_DEMO\AHRS.c\580</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>571</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134240174</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>G:\脣芦脗脰虏卯露炉\STM32鲁脤脨貌\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆拢篓16.01.14拢漏\USER\AHRS.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\STM32_DEMO\AHRS.c\571</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -463,8 +479,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>61</TopLine>
-      <CurrentLine>62</CurrentLine>
+      <TopLine>62</TopLine>
+      <CurrentLine>63</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -607,7 +623,7 @@
       <Focus>0</Focus>
       <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>432</TopLine>
+      <TopLine>430</TopLine>
       <CurrentLine>434</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UART4.c</PathWithFileName>
@@ -653,10 +669,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>41</ColumnNumber>
+      <ColumnNumber>37</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>366</TopLine>
-      <CurrentLine>382</CurrentLine>
+      <TopLine>421</TopLine>
+      <CurrentLine>422</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\USART2.c</PathWithFileName>
       <FilenameWithoutPath>USART2.c</FilenameWithoutPath>
@@ -781,10 +797,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>31</ColumnNumber>
+      <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>469</TopLine>
-      <CurrentLine>104</CurrentLine>
+      <TopLine>635</TopLine>
+      <CurrentLine>639</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\AHRS.c</PathWithFileName>
       <FilenameWithoutPath>AHRS.c</FilenameWithoutPath>

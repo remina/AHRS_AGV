@@ -56,6 +56,7 @@ float time_taken = 0.0;
 unsigned long t3 = 0;
 unsigned long t4 = 0;
 u8 op = -1;
+extern qua SEq;
 
 extern u8 UART4RecvPtrW, UART4RecvPtrR;
 int main(void)
@@ -94,7 +95,7 @@ int main(void)
 			op = AHRSCheckDataFrame();
 			if(op == ACC_METER || op == GYRO || op == ANGLE_OUTPUT || op == MAG_METER ) 
 			{
-				SensorInitial(op);
+				SensorInitial(op, &SEq);
 				t++;
 			} 
 		}
