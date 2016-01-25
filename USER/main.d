@@ -2,7 +2,7 @@ main.o: main.c
 main.o: USART1.h
 main.o: ..\CMSIS\stm32f10x.h
 main.o: ..\CMSIS\core_cm3.h
-main.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+main.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 main.o: ..\CMSIS\system_stm32f10x.h
 main.o: ..\USER\stm32f10x_conf.h
 main.o: ..\FWlib\inc\stm32f10x_adc.h
@@ -38,8 +38,8 @@ main.o: USART2.h
 main.o: MotorControl.h
 main.o: global.h
 main.o: MotorControl.h
-main.o: d:\Keil\ARM\ARMCC\bin\..\include\stdio.h
-main.o: d:\Keil\ARM\ARMCC\bin\..\include\math.h
+main.o: D:\Keil\ARM\ARMCC\bin\..\include\stdio.h
+main.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h
 main.o: USART3.h
 main.o: USART3Config.h
 main.o: USART3.h

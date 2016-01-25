@@ -19,6 +19,13 @@
 #define total                2147483648      //32bit timer's total count
 
 extern float yaw;
+extern float pitch;
+extern float roll;
+
+extern float ex;
+extern float ey;
+extern float ez;
+
 //******************************************functions for AHRS*********************************************************//
 void SensorDataProcess(u8 type);
 float invSqrt(float x);

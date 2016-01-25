@@ -3,7 +3,7 @@ usart3.o: USART3.h
 usart3.o: USART3Config.h
 usart3.o: ..\CMSIS\stm32f10x.h
 usart3.o: ..\CMSIS\core_cm3.h
-usart3.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+usart3.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 usart3.o: ..\CMSIS\system_stm32f10x.h
 usart3.o: ..\USER\stm32f10x_conf.h
 usart3.o: ..\FWlib\inc\stm32f10x_adc.h

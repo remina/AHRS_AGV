@@ -3,7 +3,7 @@ usart2.o: USART2.h
 usart2.o: USART2Config.h
 usart2.o: ..\CMSIS\stm32f10x.h
 usart2.o: ..\CMSIS\core_cm3.h
-usart2.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+usart2.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 usart2.o: ..\CMSIS\system_stm32f10x.h
 usart2.o: ..\USER\stm32f10x_conf.h
 usart2.o: ..\FWlib\inc\stm32f10x_adc.h
@@ -35,8 +35,8 @@ usart2.o: OSQMem.h
 usart2.o: MotorControl.h
 usart2.o: global.h
 usart2.o: MotorControl.h
-usart2.o: d:\Keil\ARM\ARMCC\bin\..\include\stdio.h
-usart2.o: d:\Keil\ARM\ARMCC\bin\..\include\math.h
+usart2.o: D:\Keil\ARM\ARMCC\bin\..\include\stdio.h
+usart2.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h
 usart2.o: odometry.h
 usart2.o: AHRS.h
 usart2.o: USART1.h

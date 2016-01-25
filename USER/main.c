@@ -66,7 +66,7 @@ int main(void)
 	WheelSpeed wheelspeed;
 
   	SystemInit();
-	//?????
+	
 	USART1_Init(115200);
 	USART2_Init(115200);
 	USART3_Init(38400);

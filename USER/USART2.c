@@ -322,8 +322,39 @@ static void CommandProcess(void)
 //		sensorflag = CLOSESENSOR;
 		break;
 	case MYYAW:
-		ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
-		ack_frame[1] = ((s16)(yaw *10)) & 0xFF;
+		/*ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
+		ack_frame[1] = ((s16)(yaw *10)) & 0xFF;*/
+		sprintf(ack_frame,"%s","  yaw = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",yaw);
+		USART2WriteDataToBuffer(ack_frame, 7);
+	
+		sprintf(ack_frame,"%s","  pitch = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",pitch);
+		USART2WriteDataToBuffer(ack_frame, 7);
+	
+		sprintf(ack_frame,"%s","  roll = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",roll);
+		USART2WriteDataToBuffer(ack_frame, 7);
+	
+		sprintf(ack_frame,"%s","  ez = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",ez);
+		USART2WriteDataToBuffer(ack_frame, 7);
+		
+		sprintf(ack_frame,"%s","  ey = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",ey);
+		USART2WriteDataToBuffer(ack_frame, 7);
+		
+		sprintf(ack_frame,"%s","  ex = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",ex);
+		USART2WriteDataToBuffer(ack_frame, 7);
+		
+		sprintf(ack_frame,"%s","\r\n");
 		USART2WriteDataToBuffer(ack_frame, 2);
 		break;
 	case TEST:

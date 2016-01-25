@@ -2,7 +2,7 @@ ahrs.o: AHRS.c
 ahrs.o: UART4.h
 ahrs.o: ..\CMSIS\stm32f10x.h
 ahrs.o: ..\CMSIS\core_cm3.h
-ahrs.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+ahrs.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 ahrs.o: ..\CMSIS\system_stm32f10x.h
 ahrs.o: ..\USER\stm32f10x_conf.h
 ahrs.o: ..\FWlib\inc\stm32f10x_adc.h
@@ -42,4 +42,4 @@ ahrs.o: USART1.h
 ahrs.o: USART1Config.h
 ahrs.o: USART1.h
 ahrs.o: Time.h
-ahrs.o: d:\Keil\ARM\ARMCC\bin\..\include\math.h
+ahrs.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h

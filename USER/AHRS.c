@@ -27,7 +27,7 @@ float roll_y = 0.0f, pitch_y = 0.0f, yaw_y = 0.0f;
 float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 
 //for initial quaternion
-float buffer1[8] ={0},buffer2[8] ={0},buffer3[8] ={0},buffer4[8] ={0},buffer5[8] ={0},buffer6[8] ={0},buffer7[8] ={0},buffer8[8] ={0},buffer9[8] ={0};
+float buffer1[8] ={0},buffer100[8] ={0},buffer3[8] ={0},buffer4[8] ={0},buffer5[8] ={0},buffer6[8] ={0},buffer7[8] ={0},buffer8[8] ={0},buffer9[8] ={0};
 
 u8  counter = 0;
 float bias = 0.0f;
@@ -177,9 +177,9 @@ void SensorDataProcess(u8 type)
 			//gyro_z_raw = (float)gyro_z_raw;
 			
 			//turn degreen into rad
-			w_x = 3600.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_y = 3600.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -3600.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_x = 50.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_y = 50.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -50.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			if(fabs(w_x) < 20) w_x = 0.0f;
 			if(fabs(w_y) < 20) w_y = 0.0f;
 			if(fabs(w_z) < 20) w_z = 0.0f;
@@ -266,6 +266,7 @@ void SensorInitial(u8 type)
 	/*u8 counter1 = 0;
 	u8 counter2 = 0;
 	u8 counter3 = 0;*/
+	
 	if(flag == ACC_METER || flag == GYRO || flag == ANGLE_OUTPUT || flag == MAG_METER)
 	{		
 		if(!qua_init)
@@ -449,7 +450,7 @@ void AHRS_iteration(u8 type)
 	{	
 		SensorDataProcess(flag);
 		
-		buffer1[counter] = w_x;
+		buffer1[counter] = w_x;   //并没有用counter1\counter2\counter3
 		buffer2[counter] = w_y;
 		buffer3[counter] = w_z;
 		buffer4[counter] = a_x;
@@ -575,14 +576,14 @@ void AHRS_iteration(u8 type)
 		vz = 2.0 * (0.5f - q1q1 - q2q2);
 		// Estimated direction of magnetic 
 		wx = -1.0f * 2.0 * (b_x * (0.5f - q2q2 - q3q3) + b_z * (q1q3 - q0q2));
-		wy = 2.0 * (b_x * (q1q2 - q0q3) + b_z * (q0q1 + q2q3));
-		wz = 2.0 * (b_x * (q0q2 + q1q3) + b_z * (0.5f - q1q1 - q2q2));	
+		wy =  2.0 * (b_x * (q1q2 - q0q3) + b_z * (q0q1 + q2q3));
+		wz =  2.0 * (b_x * (q0q2 + q1q3) + b_z * (0.5f - q1q1 - q2q2));	
 
 		// Error is sum of cross product between estimated direction and measured direction of field vectors(2?3?±í?ó2?￡?′?3?ó???á|3?2?3??óoí)
 		//maybe ex,ey,ex is in degreen ,which should be turn into rads(since ex,ey,ez is much too huge, making w_x,w_y,w_z turnning all the time	)
 		ex = (acc_y * vz - acc_z * vy) + (mag_y * wz - mag_z * wy);
 		ey = (acc_z * vx - acc_x * vz) + (mag_z * wx - mag_x * wz);
-		ez = (acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx);
+		ez = ((acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx));
 		/*ex = 0.0;
 		ey = 0.0;
 		ez = 0.0;*/
