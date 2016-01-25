@@ -155,50 +155,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>798</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134244160</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\脣芦脗脰虏卯露炉\STM32鲁脤脨貌\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆录脫脠毛脣脛脭陋脢媒虏氓脰碌拢篓16.01.14拢漏\USER\AHRS.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32_DEMO\AHRS.c\798</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
           <LineNumber>833</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134245450</Address>
+          <Address>134245444</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\脣芦脗脰虏卯露炉\STM32鲁脤脨貌\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆录脫脠毛脣脛脭陋脢媒虏氓脰碌拢篓16.01.14拢漏\USER\AHRS.c</Filename>
+          <Filename>C:\Users\Administrator\Desktop\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆录脫脠毛脣脛脭陋脢媒虏氓脰碌拢篓16.01.14拢漏\USER\AHRS.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\STM32_DEMO\AHRS.c\833</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>838</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134245812</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>G:\脣芦脗脰虏卯露炉\STM32鲁脤脨貌\HandyBot v1.0 8.13 +陆颅脣脮脦脌脢脫AHRS脮没脌铆录脫脠毛脣脛脭陋脢媒虏氓脰碌拢篓16.01.14拢漏\USER\AHRS.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\STM32_DEMO\AHRS.c\838</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -797,10 +765,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>42</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>820</TopLine>
-      <CurrentLine>833</CurrentLine>
+      <TopLine>826</TopLine>
+      <CurrentLine>836</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\AHRS.c</PathWithFileName>
       <FilenameWithoutPath>AHRS.c</FilenameWithoutPath>

@@ -821,19 +821,19 @@ void AHRS_iteration_qua(u8 type, qua *q, sensor_data *s)
 		//quatanion interation
 		qua_multiply(&acc_q, &mag_q, &a_m_q);
 		qua_norm(&a_m_q);
-		q->q0+= (-q->q1 * gyro_x_f - q->q2 * gyro_y_f * -1.0f - q->q3 * gyro_z_f * -1.0f) * interval / 2.0f;
-		q->q1+= (q->q0 * gyro_x_f + q->q2 * gyro_z_f * -1.0f - q->q3 * gyro_y_f * -1.0f) *  interval / 2.0f;
-		q->q2+= (q->q0 * gyro_y_f * -1.0f - q->q1 * gyro_z_f * -1.0f + q->q3 * gyro_x_f) *  interval / 2.0f;
-		q->q3+= (q->q0 * gyro_z_f * -1.0f + q->q1 * gyro_y_f * -1.0f - q->q2 * gyro_x_f) *  interval / 2.0f; 
+		q->q0+= (-q->q1 * s->gyro_x - q->q2 * s->gyro_y * -1.0f - q->q3 * s->gyro_z) * interval / 2.0f;
+		q->q1+= (q->q0 * s->gyro_x + q->q2 * s->gyro_z - q->q3 * s->gyro_y * -1.0f) *  interval / 2.0f;
+		q->q2+= (q->q0 * s->gyro_y * -1.0f - q->q1 * s->gyro_z + q->q3 * s->gyro_x) *  interval / 2.0f;
+		q->q3+= (q->q0 * s->gyro_z + q->q1 * s->gyro_y * -1.0f - q->q2 * s->gyro_x) *  interval / 2.0f; 
 
 		// Normalise quaternion
 		qua_norm(q);
 
-		//sensor fusing (complementary filter)ÔÝ¶¨0.003
-		q->q0 = 0.993 * q->q0 + a_m_q.q0 * 0.007;
-		q->q1 = 0.993 * q->q1 + a_m_q.q1 * 0.007;
-		q->q2 = 0.993 * q->q2 + a_m_q.q2 * 0.007;
-		q->q3 = 0.993 * q->q3 + a_m_q.q3 * 0.007;
+		//sensor fusing (complementary filter)ÔÝ¶¨0.02
+		q->q0 = 0.95 * q->q0 + a_m_q.q0 * 0.05;
+		q->q1 = 0.95 * q->q1 + a_m_q.q1 * 0.05;
+		q->q2 = 0.95 * q->q2 + a_m_q.q2 * 0.05;
+		q->q3 = 0.95 * q->q3 + a_m_q.q3 * 0.05;
 		//time taken
 		t2 = micros();
 		if(t2 > t1)
