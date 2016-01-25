@@ -26,5 +26,7 @@ void USART2RecvUpdate(void);
 void UART2Proc(void);
 extern u8 USART2RecvBuffer[USART2_RECV_MAX_Q];
 extern float g_bt_manual_botrate;
+extern float interval;
+
 
 #endif /* __USART2_H */

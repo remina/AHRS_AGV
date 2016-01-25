@@ -3,7 +3,7 @@
 <pre>
 <h1>礦ision Build Log</h1>
 <h2>Project:</h2>
-G:\双轮差动\STM32程序\HandyBot v1.0 8.13 +江苏卫视(1207AHRSpid参数修改)\USER\STM32-DEMO.uvproj
+C:\Users\Administrator\Desktop\HandyBot v1.0 8.13 +江苏卫视(1209四元数微分方程解法改进，改成梯形格式)\USER\STM32-DEMO.uvproj
 Project File Date:  12/02/2015
 
 <h2>Output:</h2>
@@ -58,6 +58,8 @@ USART2.c(359): warning:  #167-D: argument of type "u8 *" is incompatible with pa
 USART2.c(362): warning:  #167-D: argument of type "u8 *" is incompatible with parameter of type "char *restrict"
 USART2.c(364): warning:  #167-D: argument of type "u8 *" is incompatible with parameter of type "char *restrict"
 USART2.c(367): warning:  #167-D: argument of type "u8 *" is incompatible with parameter of type "char *restrict"
+USART2.c(369): warning:  #167-D: argument of type "u8 *" is incompatible with parameter of type "char *restrict"
+USART2.c(372): warning:  #167-D: argument of type "u8 *" is incompatible with parameter of type "char *restrict"
 USART2.c(261): warning:  #177-D: variable "j" was declared but never referenced
 USART2.c(263): warning:  #177-D: variable "robotrate" was declared but never referenced
 compiling USART2Config.c...
@@ -113,11 +115,11 @@ compiling odometry.c...
 compiling core_cm3.c...
 compiling system_stm32f10x.c...
 linking...
-Program Size: Code=44296 RO-data=864 RW-data=860 ZI-data=9524  
+Program Size: Code=44368 RO-data=864 RW-data=860 ZI-data=9524  
 FromELF: creating hex file...
-"..\Output\STM32-DEMO.axf" - 0 Errors, 56 Warning(s).
+"..\Output\STM32-DEMO.axf" - 0 Errors, 58 Warning(s).
 Load "..\\Output\\STM32-DEMO.axf" 
-Set JLink Project File to "G:\双轮差动\STM32程序\HandyBot v1.0 8.13 +江苏卫视(1207AHRSpid参数修改)\USER\JLinkSettings.ini"
+Set JLink Project File to "C:\Users\Administrator\Desktop\HandyBot v1.0 8.13 +江苏卫视(1209四元数微分方程解法改进，改成梯形格式)\USER\JLinkSettings.ini"
 * JLink Info: Device "STM32F103VE" selected (512 KB flash, 64 KB RAM).
  
 JLink info:
