@@ -1,0 +1,1 @@
+-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\CMSIS -I..\USER -I..\FWlib\inc -I..\FWlib\src -I "E:\KEIL\ARM\INC" -I "E:\KEIL\ARM\INC\ST\STM32F10x" -DUSE_STDPERIPH_DRIVER -DSTM32F10X_HD -o "..\Output\motorcontrol.o" --omf_browse "..\Output\motorcontrol.crf" --depend "..\Output\motorcontrol.d" "MotorControl.c"

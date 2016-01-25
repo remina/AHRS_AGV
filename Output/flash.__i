@@ -1,0 +1,1 @@
+-c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork -I..\CMSIS -I..\USER -I..\FWlib\inc -I..\FWlib\src -I "E:\KEIL\ARM\INC" -I "E:\KEIL\ARM\INC\ST\STM32F10x" -DUSE_STDPERIPH_DRIVER -DSTM32F10X_HD -o "..\Output\flash.o" --omf_browse "..\Output\flash.crf" --depend "..\Output\flash.d" "FLASH.c"
