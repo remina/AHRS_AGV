@@ -6,7 +6,7 @@
 #include "stm32f10x.h"
 #include "AHRS.h"
 #include "Time.h"
-#include "math.h"  
+#include "math.h"
 
 //*****************************************variebles for AHRS ****************************************************//
 bool cut_off = false;
@@ -19,14 +19,14 @@ float gyro_x_p = 0.0f, gyro_y_p = 0.0f, gyro_z_p = 0.0f;
 float a_x = 0.0f, a_y = 0.0f, a_z = -1.0f, w_x = 0.0f, w_y = 0.0f, w_z = 0.0f, m_x = -1.0f, m_y = 0.0f, m_z = 0.0f;
 float b_x = -1.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
-
+float magx, magy, magz;
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
 //float SEq_1_n = 1.0f, SEq_2_n = 0.0f, SEq_3_n = 0.0f, SEq_4_n = 0.0f;     //用于构造梯形结构解微分方程
 
 
-float twoKp_z = 150.0f, twoKp_x = 150.0, twoKp_y = 150.0, twoKi_z = 1.0, twoKi_x = 1.0, twoKi_y = 1.0, twoKd_x = 0.0, twoKd_y = 0.0, twoKd_z = 0.0;
+float twoKp_z = 260.0f, twoKp_x = 260.0, twoKp_y = 260.0, twoKi_z = 10.0, twoKi_x = 10.0, twoKi_y = 10.0, twoKd_x = 0.0, twoKd_y = 0.0, twoKd_z = 0.0;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
-static char cut_count;
+static int cut_count = 0;
 float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 
 //for initial quaternion
@@ -87,7 +87,7 @@ u8 AHRSCheckDataFrame(void)
       k = 0;
       i = UART4RecvPtrR;
       if ((u8)UART4RecvBuffer[i] == FIRST_FRAMEHEADER) 
-			{
+	  {
         k++;
       }
       
@@ -160,7 +160,7 @@ void SensorDataProcess(u8 type)
 			//turn degreen into rad
 			w_x = 200.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			w_y = 200.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -200.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -260.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			if(fabs(w_x) < 0.2) w_x = 0.0f;
 			if(fabs(w_y) < 0.2) w_y = 0.0f;
 			if(fabs(w_z) < 0.2) w_z = 0.0f;
@@ -193,9 +193,9 @@ void SensorDataProcess(u8 type)
 			mag_z_raw = rawdata[7] << 8;
 			mag_z_raw += rawdata[6];		
 			
-			m_x = -1.0f * mag_x_raw;
-			m_y = mag_y_raw;
-			m_z = mag_z_raw;
+			m_x = (float)-1.0f * mag_x_raw;
+			m_y = (float)mag_y_raw;
+			m_z = (float)mag_z_raw;
 			break;
 		}
 		default:;
@@ -472,22 +472,25 @@ void AHRS_iteration(u8 type)
 		mag_z = sum / 6.0f;
 		sum = 0;
 		cal_ready = true;
+		magx = mag_x;
+		magy = mag_y;
+		magz = mag_z;
 	}
 	
 	//**************************update quanion***************************//
 	if(cal_ready)
 	{ 
 		//if((fabs(gyro_x - gyro_x_p) > 20.0) || (fabs(gyro_y - gyro_y_p) > 20.0) || (fabs(gyro_z - gyro_z_p) > 20.0) || !cut_off) cut_off = true;	
-		if(fabs(gyro_z - gyro_z_p) > 5.0 || fabs(gyro_z_p - gyro_z) > 5.0) cut_off = true;
+		/*if(fabs(gyro_z - gyro_z_p) > 5.0 || fabs(gyro_z_p - gyro_z) > 5.0) cut_off = true;
 		gyro_x_p = gyro_x;
 		gyro_y_p = gyro_y;
-		gyro_z_p = gyro_z;
+		gyro_z_p = gyro_z;*/
 		//abort adjust without MAG,only using gravity
 		if(cut_off) 
 		{
 			 //the interial calculation takes about 400ms,if need 8s to cutoff mag so, count should be 
 			cut_count++;
-			if(cut_count == (char)250)
+			if(cut_count == 800)
 			{
 				cut_count = 0;
 				cut_off = false;
@@ -684,7 +687,6 @@ void AHRS_iteration(u8 type)
 
 void AHRS_computeEuler(void)
 {
-	u8 ack_frame[8];
 	pitch = -1.0f * asin(-2*SEq_2*SEq_4 + 2*SEq_1*SEq_3) / PI * 180.0;	 
     roll  = atan2(2*SEq_3*SEq_4 + 2*SEq_1*SEq_2,-2*SEq_2*SEq_2 - 2*SEq_3*SEq_3 + 1) / PI * 180;
 	yaw   = atan2(2*SEq_2*SEq_3 + 2*SEq_1*SEq_4,-2*SEq_3*SEq_3 - 2*SEq_4*SEq_4 + 1) / PI * 180;

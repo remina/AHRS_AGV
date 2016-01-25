@@ -28,6 +28,6 @@ extern u8 USART2RecvBuffer[USART2_RECV_MAX_Q];
 extern float g_bt_manual_botrate;
 extern float interval;
 extern float twoKp_z, twoKp_x, twoKp_y, twoKi_z, twoKi_x, twoKi_y, twoKd_x, twoKd_y, twoKd_z;
-
+extern float mag_x, mag_y, mag_z;
 
 #endif /* __USART2_H */

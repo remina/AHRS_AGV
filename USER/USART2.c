@@ -59,6 +59,7 @@ OSMEMTcb* OSQUSART2Index;
 #define STOP_MOVE_TARGET	0x21
 #define PID_ADJUST			0x30
 #define AHRSPID				0x31
+#define MOVE_STEP           0X40
 
 int ucTranslateRate[3], ucAngle[3], ucRotateRate[3];
 u8  rateIndex = 0;
@@ -281,6 +282,9 @@ static void CommandProcess(void)
 	extern float ex;
 	extern float ey;
 	extern float ez;	
+	extern float magz;
+	extern float magy;
+	extern float magx;
 	u8 ack_frame[8];
 
 //	WheelSpeed  realspeed;
@@ -363,7 +367,21 @@ static void CommandProcess(void)
 		USART2WriteDataToBuffer(ack_frame, 9);
 		sprintf(ack_frame,"%f",roll);
 		USART2WriteDataToBuffer(ack_frame, 7);*/
+
+		sprintf(ack_frame,"%s","  mag_x = ");
+		USART2WriteDataToBuffer(ack_frame, 10);
+		sprintf(ack_frame,"%f",magx);
+		USART2WriteDataToBuffer(ack_frame, 7);
 	
+		sprintf(ack_frame,"%s","  mag_y = ");
+		USART2WriteDataToBuffer(ack_frame, 10);
+		sprintf(ack_frame,"%f",magy);
+		USART2WriteDataToBuffer(ack_frame, 7);
+	
+		sprintf(ack_frame,"%s","  mag_z = ");
+		USART2WriteDataToBuffer(ack_frame, 10);
+		sprintf(ack_frame,"%f",magz);
+		USART2WriteDataToBuffer(ack_frame, 7);
 		/*sprintf(ack_frame,"%s","  kp = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
 		sprintf(ack_frame,"%f",twoKp_z);
@@ -384,7 +402,7 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%f",interval);
 		USART2WriteDataToBuffer(ack_frame, 7);*/
 		
-		sprintf(ack_frame,"%s","  ex = ");
+		/*sprintf(ack_frame,"%s","  ex = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
 		sprintf(ack_frame,"%f",ex);
 		USART2WriteDataToBuffer(ack_frame, 7);
@@ -402,7 +420,7 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%s","  time = ");
 		USART2WriteDataToBuffer(ack_frame, 15);
 		sprintf(ack_frame,"%f",interval);
-		USART2WriteDataToBuffer(ack_frame, 7);
+		USART2WriteDataToBuffer(ack_frame, 7);*/
 		
 		sprintf(ack_frame,"%s","\r\n");
 		USART2WriteDataToBuffer(ack_frame, 2);
@@ -446,11 +464,11 @@ static void CommandProcess(void)
 		break;
 	case PID_ADJUST:
 		value = USART2RecvBuffer[USART2RecvBufStart + 1];
-		yaw_pid.kp = (float)(value / 10.0);
+		yaw_pid.kp = (float)(value / 100.0);
 		value = USART2RecvBuffer[USART2RecvBufStart + 2];
-		yaw_pid.ki = (float)(value / 10.0);
+		yaw_pid.ki = (float)(value / 1000.0);
 		value = USART2RecvBuffer[USART2RecvBufStart + 3];
-		yaw_pid.kd = (float)(value / 10.0);
+		yaw_pid.kd = (float)(value / 1000.0);
 		break;
 	case AHRSPID:
 		value = USART2RecvBuffer[USART2RecvBufStart + 1];
@@ -465,6 +483,13 @@ static void CommandProcess(void)
 		twoKd_x = (float)(value / 10.0);
 		twoKd_y = twoKd_x; 
 		twoKd_z = twoKd_x;
+	case MOVE_STEP:
+		move_target_flag = 1;
+		g_bt_manual_flag = TRUE;
+		long_value = ((USART2RecvBuffer[USART2RecvBufStart + 1]) << 8) | (USART2RecvBuffer[USART2RecvBufStart + 2]);
+		hold_yaw = (float)((long_value / 10.0) + yaw);
+		g_bt_manual_botrate = 0.0;
+		break;
     break;
 	}
 }
