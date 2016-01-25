@@ -53,7 +53,7 @@ OSMEMTcb *OSMemCreate(u8 *ptr,u8 blksize,u8 nblks,u8 *err)
 	OSMemTcb[i].OSMemNBlks=nblks;							//内存块管理区的内存块的总数量
 	OSMemTcb[i].OSMemFreeNBlks=nblks;						//内存块管理区的空白内存块的数量
 	j=i;
-	OSMemInit(ptr,blksize*nblks);							//将内存块内的数据初始化
+	OSMemInit(ptr,blksize*nblks);							//将内存块内的数据初始化(*是乘法)
 	for(i=0;i<nblks-1;i++)									//
 	{
 		*plink=(void *)(link);								//该内存块的地址存放的是第二片内存区的首地址
@@ -80,7 +80,7 @@ u8 *OSMemGet(OSMEMTcb *ptr,u8 *err)
 	(*ptr).OSMemFreeNBlks--;								//空白内存块块数量减一
 	if((*ptr).OSMemFreeNBlks!=0)(*ptr).OSMemFreeList=*(void **)tcb;	//强制类型转换
 	index=(u8 *)tcb;
-	index+=4;
+	index+=4;                                               //每一块长度32
 	*err=0;
 	return index;	 										//返回获取的空白内存块的首地址
 }

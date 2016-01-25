@@ -103,6 +103,9 @@ void SensorInitial(u8 type, qua *q);
 void AHRS_iteration(u8 type, qua *q , sensor_data *s);
 //***********************************基于四元数的互补******************************************************//
 void AHRS_iteration_qua(u8 type, qua *q , sensor_data *s);
+//************************************梯度下降算法**********************************************************//
+void AHRS_iteration_gradian(u8 type, qua *q, sensor_data *s);
+
 void AHRS_computeEuler(qua *q);
 void AHRS_compute();
 
