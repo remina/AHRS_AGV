@@ -19,7 +19,7 @@ float b_x = -1.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
 
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
-float twoKp = 0.02f, twoKi = 0.0006f;
+float twoKp_z = 0.18f, twoKp_x = 0.09, twoKp_y = 0.09, twoKi_z = 0.004f, twoKi_x = 0.0003, twoKi_z = 0.0003;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
 
 float roll_m = 0.0f, pitch_m = 0.0f, yaw_m = 0.0f;
@@ -27,7 +27,7 @@ float roll_y = 0.0f, pitch_y = 0.0f, yaw_y = 0.0f;
 float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 
 //for initial quaternion
-float buffer1[8] ={0},buffer100[8] ={0},buffer3[8] ={0},buffer4[8] ={0},buffer5[8] ={0},buffer6[8] ={0},buffer7[8] ={0},buffer8[8] ={0},buffer9[8] ={0};
+float buffer1[8] ={0},buffer2[8] ={0},buffer3[8] ={0},buffer4[8] ={0},buffer5[8] ={0},buffer6[8] ={0},buffer7[8] ={0},buffer8[8] ={0},buffer9[8] ={0};
 
 u8  counter = 0;
 float bias = 0.0f;
@@ -170,19 +170,22 @@ void SensorDataProcess(u8 type)
 			gyro_y_raw = rawdata[5] << 8;
 			gyro_y_raw += rawdata[4];
 			gyro_z_raw = rawdata[7] << 8;
-			gyro_z_raw += rawdata[8];
+			gyro_z_raw += rawdata[6];
 			
 			//gyro_x_raw = (float)gyro_x_raw;
 			//gyro_y_raw = (float)gyro_y_raw;
 			//gyro_z_raw = (float)gyro_z_raw;
 			
 			//turn degreen into rad
-			w_x = 50.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_y = 50.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -50.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			if(fabs(w_x) < 20) w_x = 0.0f;
-			if(fabs(w_y) < 20) w_y = 0.0f;
-			if(fabs(w_z) < 20) w_z = 0.0f;
+			w_x = 20.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_y = 20.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -100.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			if(fabs(w_x) < 0.2) w_x = 0.0f;
+			if(fabs(w_y) < 0.2) w_y = 0.0f;
+			if(fabs(w_z) < 0.2) w_z = 0.0f;
+			/*w_x = 0.0;
+			w_y = 0.0;
+			w_z = 0.0;*/
 			break;
 		}
 		case 0x51:
@@ -205,7 +208,7 @@ void SensorDataProcess(u8 type)
 			acc_y_raw = rawdata[5] << 8;
 			acc_y_raw += rawdata[4];
 			acc_z_raw = rawdata[7] << 8;
-			acc_z_raw += rawdata[8];
+			acc_z_raw += rawdata[6];
 			
 			//acc_x_raw = (float)acc_x_raw;
 			//acc_y_raw = (float)acc_y_raw;
@@ -237,7 +240,7 @@ void SensorDataProcess(u8 type)
 			mag_y_raw = rawdata[5] << 8;
 			mag_y_raw += rawdata[4];
 			mag_z_raw = rawdata[7] << 8;
-			mag_z_raw += rawdata[8];
+			mag_z_raw += rawdata[6];
 
 			//mag_x_raw = (float)mag_x_raw;
 			//mag_y_raw = (float)mag_y_raw;
@@ -266,7 +269,6 @@ void SensorInitial(u8 type)
 	/*u8 counter1 = 0;
 	u8 counter2 = 0;
 	u8 counter3 = 0;*/
-	
 	if(flag == ACC_METER || flag == GYRO || flag == ANGLE_OUTPUT || flag == MAG_METER)
 	{		
 		if(!qua_init)
@@ -450,7 +452,7 @@ void AHRS_iteration(u8 type)
 	{	
 		SensorDataProcess(flag);
 		
-		buffer1[counter] = w_x;   //并没有用counter1\counter2\counter3
+		buffer1[counter] = w_x;
 		buffer2[counter] = w_y;
 		buffer3[counter] = w_z;
 		buffer4[counter] = a_x;
@@ -583,7 +585,7 @@ void AHRS_iteration(u8 type)
 		//maybe ex,ey,ex is in degreen ,which should be turn into rads(since ex,ey,ez is much too huge, making w_x,w_y,w_z turnning all the time	)
 		ex = (acc_y * vz - acc_z * vy) + (mag_y * wz - mag_z * wy);
 		ey = (acc_z * vx - acc_x * vz) + (mag_z * wx - mag_x * wz);
-		ez = ((acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx));
+		ez = ((acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx)) * 0.2;
 		/*ex = 0.0;
 		ey = 0.0;
 		ez = 0.0;*/
@@ -594,11 +596,11 @@ void AHRS_iteration(u8 type)
 		if(fabs(ez) < (PI / 360.0)){ez = 0.0f;}
 	
 		// Compute and apply integral feedback if enabled(ó?2?3??ó2?PIDT?yíó?Yò?)
-		if(ex != 0.0f && ey != 0.0f && ez != 0.0f && twoKi > 0.0f) 
+		if(ex != 0.0f && ey != 0.0f && ez != 0.0f) 
 		{
-			integralFb_x += twoKi * ex ;	// integral error scaled by Ki
-			integralFb_y += twoKi * ey ;
-			integralFb_z += twoKi * ez ;
+			integralFb_x += twoKi_x * ex ;	// integral error scaled by Ki
+			integralFb_y += twoKi_y * ey ;
+			integralFb_z += twoKi_z * ez ;
 		
 			gyro_x += integralFb_x;	// apply integral feedback
 			gyro_y += integralFb_y;
@@ -612,9 +614,9 @@ void AHRS_iteration(u8 type)
 		}
 
 		// Apply proportional feedback
-		gyro_x += twoKp * ex;
-		gyro_y += twoKp * ey;
-		gyro_z += twoKp * ez;
+		gyro_x += twoKp_x * ex;
+		gyro_y += twoKp_y * ey;
+		gyro_z += twoKp_z * ez;
 	
 		gyro_x_f = gyro_x;
 		gyro_y_f = gyro_y;
