@@ -58,6 +58,8 @@ OSMEMTcb* OSQUSART2Index;
 #define MOVE_TARGET			0x20
 #define STOP_MOVE_TARGET	0x21
 #define PID_ADJUST			0x30
+#define AHRSPID				0x31
+
 int ucTranslateRate[3], ucAngle[3], ucRotateRate[3];
 u8  rateIndex = 0;
 
@@ -266,6 +268,15 @@ static void CommandProcess(void)
 	extern u8 move_all_flag;
 	extern u8 move_target_flag;
 	extern K_PD yaw_pid;
+	extern float twoKp_z;
+	extern float twoKi_z;
+	extern float twoKd_z;
+	extern float twoKp_x;
+	extern float twoKi_x;
+	extern float twoKd_x;
+	extern float twoKp_y;
+	extern float twoKi_y;
+	extern float twoKd_y;
 	u8 ack_frame[8];
 
 //	WheelSpeed  realspeed;
@@ -349,25 +360,25 @@ static void CommandProcess(void)
 		sprintf(ack_frame,"%f",roll);
 		USART2WriteDataToBuffer(ack_frame, 7);
 	
-		sprintf(ack_frame,"%s","  ez = ");
+		/*sprintf(ack_frame,"%s","  kp = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
-		sprintf(ack_frame,"%f",ez);
-		USART2WriteDataToBuffer(ack_frame, 7);
-		
-		sprintf(ack_frame,"%s","  ey = ");
-		USART2WriteDataToBuffer(ack_frame, 7);
-		sprintf(ack_frame,"%f",ey);
+		sprintf(ack_frame,"%f",twoKp_z);
 		USART2WriteDataToBuffer(ack_frame, 7);
 		
-		sprintf(ack_frame,"%s","  ex = ");
+		sprintf(ack_frame,"%s","  ki = ");
 		USART2WriteDataToBuffer(ack_frame, 7);
-		sprintf(ack_frame,"%f",ex);
+		sprintf(ack_frame,"%f",twoKi_z);
+		USART2WriteDataToBuffer(ack_frame, 7);
+		
+		sprintf(ack_frame,"%s","  kd = ");
+		USART2WriteDataToBuffer(ack_frame, 7);
+		sprintf(ack_frame,"%f",twoKd_z);
 		USART2WriteDataToBuffer(ack_frame, 7);
 
-		sprintf(ack_frame,"%s","  time taken = ");
+		sprintf(ack_frame,"%s","  time = ");
 		USART2WriteDataToBuffer(ack_frame, 15);
 		sprintf(ack_frame,"%f",interval);
-		USART2WriteDataToBuffer(ack_frame, 7);
+		USART2WriteDataToBuffer(ack_frame, 7);*/
 		
 		sprintf(ack_frame,"%s","\r\n");
 		USART2WriteDataToBuffer(ack_frame, 2);
@@ -415,17 +426,22 @@ static void CommandProcess(void)
 		value = USART2RecvBuffer[USART2RecvBufStart + 2];
 		yaw_pid.ki = (float)(value / 100.0);
 		value = USART2RecvBuffer[USART2RecvBufStart + 3];
-		yaw_pid.kd = (float)(value / 100.0);	
+		yaw_pid.kd = (float)(value / 100.0);
 		break;
-// case SONARVAL:
-//      j = (UART4RecvBufStart + 1) & (MAX_RCV_BYTES - 1);
-//      for(i = 0; i < MAX_SONAR_NUM; i++) {
-//        ga_ucDisData[i] = UART4RecvBuffer[j];
-//        j = (j + 1) & (MAX_RCV_BYTES - 1);        
-//      }
-//      oneSensorCycle();
-//      UpdateObastacle();
-//      break;
+case AHRSPID:
+		value = USART2RecvBuffer[USART2RecvBufStart + 1];
+		twoKp_z = (float) value;
+		twoKp_x = twoKp_z;
+		twoKp_y = twoKp_z;
+		value = USART2RecvBuffer[USART2RecvBufStart + 2];
+		twoKi_z = (float)(value / 10.0);
+		twoKi_x = twoKi_z; 
+		twoKi_y = twoKi_z;
+		value = USART2RecvBuffer[USART2RecvBufStart + 3];
+		twoKd_x = (float)(value / 10.0);
+		twoKd_y = twoKd_x; 
+		twoKd_z = twoKd_x;
+    break;
 	}
 }
 

@@ -20,11 +20,14 @@ float b_x = -1.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
 
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
-float twoKp_z = 210.0f, twoKp_x = 210, twoKp_y = 210, twoKi_z = 10.0, twoKi_x = 10.0, twoKi_y = 10.0, twoKd_x = 12.0, twoKd_y = 12.0, twoKd_z = 12.0;
+//float SEq_1_n = 1.0f, SEq_2_n = 0.0f, SEq_3_n = 0.0f, SEq_4_n = 0.0f;     //用于构造梯形结构解微分方程
+
+
+float twoKp_z = 10.0f, twoKp_x = 10.0, twoKp_y = 10.0, twoKi_z = 0.0, twoKi_x = 0.0, twoKi_y = 0.0, twoKd_x = 0.0, twoKd_y = 0.0, twoKd_z = 0.0;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
 
-float roll_m = 0.0f, pitch_m = 0.0f, yaw_m = 0.0f;
-float roll_y = 0.0f, pitch_y = 0.0f, yaw_y = 0.0f;
+//float roll_m = 0.0f, pitch_m = 0.0f, yaw_m = 0.0f;
+//float roll_y = 0.0f, pitch_y = 0.0f, yaw_y = 0.0f;
 float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;
 
 //for initial quaternion
@@ -165,7 +168,7 @@ void SensorDataProcess(u8 type)
 			//turn degreen into rad
 			w_x = 20.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			w_y = 20.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -115.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -180.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			if(fabs(w_x) < 0.2) w_x = 0.0f;
 			if(fabs(w_y) < 0.2) w_y = 0.0f;
 			if(fabs(w_z) < 0.2) w_z = 0.0f;
@@ -261,27 +264,28 @@ void SensorInitial(u8 type)
 			}
 			if((counter1 > 6) && (counter2 > 6) && (counter3 > 6))
 			{
+				//为了速度加快，加入一个粗糙的加权均值滤波
 				for(j = 0;j < counter1;j++)
 				{
-					sum += buffer1[j];
+					sum += buffer1[j] * (j + 1);
 				}
-				bias = sum / (float)counter1;
+				bias = sum / 36.0f;
 				sum = 0;
 				w_x_bias = bias;
 	
 				for(j = 0;j < counter1;j++)
 				{
-					sum += buffer2[j];
+					sum += buffer2[j] * (j + 1);
 				}
-				bias = sum / (float)counter1;
+				bias = sum / 36.0f;
 				sum = 0;
 				w_y_bias = bias;
 				
 				for(j = 0;j < counter1;j++)
 				{
-					sum += buffer3[j];
+					sum += buffer3[j] * (j + 1);
 				}
-				bias = sum / (float)counter1;
+				bias = sum / 36.0f;
 				sum = 0;
 				w_z_bias = bias;
 
@@ -381,7 +385,12 @@ void SensorInitial(u8 type)
 			SEq_2 = sin(0.5 * roll) * cos(0.5 * pitch) * cos(0.5 * yaw) - cos(0.5 * roll) * sin(0.5 * pitch) * sin(0.5 * yaw);  
 			SEq_3 = cos(0.5 * roll) * sin(0.5 * pitch) * cos(0.5 * yaw) + sin(0.5 * roll) * cos(0.5 * pitch) * sin(0.5 * yaw);  
 			SEq_4 = cos(0.5 * roll) * cos(0.5 * pitch) * sin(0.5 * yaw) - sin(0.5 * roll) * sin(0.5 * pitch) * cos(0.5 * yaw);                                         
-			
+			/*
+			SEq_1_n = SEq_1;
+			SEq_2_n = SEq_2;
+			SEq_3_n = SEq_3;
+			SEq_4_n = SEq_4;
+			*/
 			counter1 = 0;counter2 = 0;counter3 = 0;
 		}                                                  
 	}
@@ -421,9 +430,9 @@ void AHRS_iteration(u8 type)
 		//mean filter
 		for( j = 0;j < 6;j++)
 		{
-			sum += buffer1[j];
+			sum += buffer1[j] * (j + 1);
 		}
-		gyro_x = sum / 6.0f - w_x_bias;
+		gyro_x = sum / 36.0f - w_x_bias;
 		//if(sum < 0) gyro_x = -gyro_x;
 		//gyro_x = (sum / 6.0f) - w_x_bias * 0.5;
 		//gyro_x = sum / 6.0f;
@@ -434,9 +443,9 @@ void AHRS_iteration(u8 type)
 				
 		for( j = 0;j < 6;j++)
 		{
-			sum += buffer2[j];
+			sum += buffer2[j] * (j + 1);
 		}
-		gyro_y = sum / 6.0f - w_y_bias;
+		gyro_y = sum / 36.0f - w_y_bias;
 		//if(sum < 0) gyro_y = -gyro_y;
 		//gyro_y = (sum / 6.0f) - w_y_bias * 0.5;
 		//gyro_y = sum / 6.0f;
@@ -446,9 +455,9 @@ void AHRS_iteration(u8 type)
 		
 		for( j = 0;j < 6;j++)
 		{
-			sum += buffer3[j];
+			sum += buffer3[j] * (j + 1);
 		}
-		gyro_z = sum / 6.0f - w_z_bias;
+		gyro_z = sum / 36.0f - w_z_bias;
 		//if(sum < 0) gyro_z = -gyro_z;
 		//gyro_z = (sum / 6.0f) - w_z_bias * 0.5;
 		//gyro_z = sum / 6.0f;
@@ -613,7 +622,20 @@ void AHRS_iteration(u8 type)
 		SEq_2 += (SEq_1 * gyro_x_f + SEq_3 * gyro_z_f * -1.0f - SEq_4 * gyro_y_f * -1.0f) *  interval / 2.0f;
 		SEq_3 += (SEq_1 * gyro_y_f * -1.0f - SEq_2 * gyro_z_f * -1.0f + SEq_4 * gyro_x_f) *  interval / 2.0f;
 		SEq_4 += (SEq_1 * gyro_z_f * -1.0f + SEq_2 * gyro_y_f * -1.0f - SEq_3 * gyro_x_f) *  interval / 2.0f; 
-	
+
+		/*
+		//先迭代一次，保存f(xn+1,yn+1)
+		SEq_1_n += (-SEq_2 * gyro_x_f - SEq_3 * gyro_y_f * -1.0f - SEq_4 * gyro_z_f * -1.0f) * interval / 2.0f;
+		SEq_2_n += (SEq_1 * gyro_x_f + SEq_3 * gyro_z_f * -1.0f - SEq_4 * gyro_y_f * -1.0f) *  interval / 2.0f;
+		SEq_3_n += (SEq_1 * gyro_y_f * -1.0f - SEq_2 * gyro_z_f * -1.0f + SEq_4 * gyro_x_f) *  interval / 2.0f;
+		SEq_4_n += (SEq_1 * gyro_z_f * -1.0f + SEq_2 * gyro_y_f * -1.0f - SEq_3 * gyro_x_f) *  interval / 2.0f; 
+
+		//再梯形结构，计算f(xn+1,yn+1)
+		SEq_1 += (SEq_1 + SEq_1_n) * interval / 2.0f;
+		SEq_2 += (SEq_2 + SEq_2_n) *  interval / 2.0f;
+		SEq_3 += (SEq_3 + SEq_3_n) *  interval / 2.0f;
+		SEq_4 += (SEq_4 + SEq_4_n) *  interval / 2.0f; 
+		*/
 		// Normalise quaternion
 		norm = invSqrt(SEq_1 * SEq_1 + SEq_2 * SEq_2 + SEq_3 * SEq_3 + SEq_4 * SEq_4);
 		SEq_1 *= norm;
@@ -628,8 +650,8 @@ void AHRS_computeEuler(void)
 	u8 ack_frame[8];
 	//u8 i = 0;
 	pitch = -1.0f * asin(-2*SEq_2*SEq_4 + 2*SEq_1*SEq_3) / PI * 180.0;	 
-    roll  = atan2(2*SEq_3*SEq_4 + 2*SEq_1*SEq_2,-2*SEq_2*SEq_2 - 2*SEq_3*SEq_3 + 1) / PI * 180;
-  	yaw   = atan2(2*SEq_2*SEq_3 + 2*SEq_1*SEq_4,-2*SEq_3*SEq_3 - 2*SEq_4*SEq_4 + 1) / PI * 180;
+  roll  = atan2(2*SEq_3*SEq_4 + 2*SEq_1*SEq_2,-2*SEq_2*SEq_2 - 2*SEq_3*SEq_3 + 1) / PI * 180;
+	yaw   = atan2(2*SEq_2*SEq_3 + 2*SEq_1*SEq_4,-2*SEq_3*SEq_3 - 2*SEq_4*SEq_4 + 1) / PI * 180;
 
 	//sprintf(ack_frame,"%f",yaw);
 	//USART2WriteDataToBuffer(ack_frame, 7);
