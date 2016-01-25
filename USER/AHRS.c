@@ -19,7 +19,7 @@ float b_x = -1.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
 
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
-float twoKp_z = 0.18f, twoKp_x = 0.09, twoKp_y = 0.09, twoKi_z = 0.004f, twoKi_x = 0.0003, twoKi_z = 0.0003;
+float twoKp = 0.06f, twoKi = 0.0006f;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
 
 float roll_m = 0.0f, pitch_m = 0.0f, yaw_m = 0.0f;
@@ -177,15 +177,12 @@ void SensorDataProcess(u8 type)
 			//gyro_z_raw = (float)gyro_z_raw;
 			
 			//turn degreen into rad
-			w_x = 20.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_y = 20.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -100.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_x = 110.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_y = 135.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -120.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			if(fabs(w_x) < 0.2) w_x = 0.0f;
 			if(fabs(w_y) < 0.2) w_y = 0.0f;
 			if(fabs(w_z) < 0.2) w_z = 0.0f;
-			/*w_x = 0.0;
-			w_y = 0.0;
-			w_z = 0.0;*/
 			break;
 		}
 		case 0x51:
@@ -585,7 +582,7 @@ void AHRS_iteration(u8 type)
 		//maybe ex,ey,ex is in degreen ,which should be turn into rads(since ex,ey,ez is much too huge, making w_x,w_y,w_z turnning all the time	)
 		ex = (acc_y * vz - acc_z * vy) + (mag_y * wz - mag_z * wy);
 		ey = (acc_z * vx - acc_x * vz) + (mag_z * wx - mag_x * wz);
-		ez = ((acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx)) * 0.2;
+		ez = (acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx);
 		/*ex = 0.0;
 		ey = 0.0;
 		ez = 0.0;*/
@@ -596,11 +593,11 @@ void AHRS_iteration(u8 type)
 		if(fabs(ez) < (PI / 360.0)){ez = 0.0f;}
 	
 		// Compute and apply integral feedback if enabled(ио?2?3??ио2?PIDT?yикио?Yи░?)
-		if(ex != 0.0f && ey != 0.0f && ez != 0.0f) 
+		if(ex != 0.0f && ey != 0.0f && ez != 0.0f && twoKi > 0.0f) 
 		{
-			integralFb_x += twoKi_x * ex ;	// integral error scaled by Ki
-			integralFb_y += twoKi_y * ey ;
-			integralFb_z += twoKi_z * ez ;
+			integralFb_x += twoKi * ex ;	// integral error scaled by Ki
+			integralFb_y += twoKi * ey ;
+			integralFb_z += twoKi * ez ;
 		
 			gyro_x += integralFb_x;	// apply integral feedback
 			gyro_y += integralFb_y;
@@ -614,9 +611,9 @@ void AHRS_iteration(u8 type)
 		}
 
 		// Apply proportional feedback
-		gyro_x += twoKp_x * ex;
-		gyro_y += twoKp_y * ey;
-		gyro_z += twoKp_z * ez;
+		gyro_x += twoKp * ex;
+		gyro_y += twoKp * ey;
+		gyro_z += twoKp * ez;
 	
 		gyro_x_f = gyro_x;
 		gyro_y_f = gyro_y;
