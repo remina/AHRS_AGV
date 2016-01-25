@@ -32,9 +32,14 @@ ahrs.o: ..\FWlib\inc\misc.h
 ahrs.o: OSQMem.h
 ahrs.o: UART4Config.h
 ahrs.o: UART4.h
-ahrs.o: global.h
+ahrs.o: USART2.h
+ahrs.o: USART2Config.h
+ahrs.o: USART2.h
 ahrs.o: MotorControl.h
 ahrs.o: global.h
+ahrs.o: MotorControl.h
+ahrs.o: D:\Keil\ARM\ARMCC\bin\..\include\stdio.h
+ahrs.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h
 ahrs.o: sensors.h
 ahrs.o: FLASH.h
 ahrs.o: AHRS.h
@@ -42,4 +47,3 @@ ahrs.o: USART1.h
 ahrs.o: USART1Config.h
 ahrs.o: USART1.h
 ahrs.o: Time.h
-ahrs.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h

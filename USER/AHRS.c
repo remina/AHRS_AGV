@@ -1,5 +1,6 @@
 
 #include "UART4.h"
+#include "USART2.h"
 #include "global.h"
 #include "sensors.h"
 #include "FLASH.h"
@@ -19,7 +20,7 @@ float b_x = -1.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
 
 float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
-float twoKp_z = 0.18f, twoKp_x = 0.09, twoKp_y = 0.095, twoKi_z = 0.006f, twoKi_x = 0.0003, twoKi_y = 0.0003;
+float twoKp_z = 210.0f, twoKp_x = 210, twoKp_y = 210, twoKi_z = 10.0, twoKi_x = 10.0, twoKi_y = 10.0, twoKd_x = 12.0, twoKd_y = 12.0, twoKd_z = 12.0;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
 
 float roll_m = 0.0f, pitch_m = 0.0f, yaw_m = 0.0f;
@@ -54,6 +55,8 @@ u8 AHRSRecvState = 0;
 
 float ex = 0.0f, ey = 0.0f, ez = 0.0f;
 float integralFb_x = 0.0f, integralFb_y = 0.0f, integralFb_z = 0.0f;
+float pex = 0.0f, pey = 0.0f, pez = 0.0f;
+float dex = 0.0f, dey = 0.0f, dez = 0.0f;
 
 extern u8 UART4RecvPtrW, UART4RecvPtrR;
 extern u8 UART4RecvBufStart, UART4RecvBufEnd;
@@ -162,7 +165,7 @@ void SensorDataProcess(u8 type)
 			//turn degreen into rad
 			w_x = 20.0f * gyro_x_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			w_y = 20.0f * gyro_y_raw / 32768.0 * 2000.0 / 180.0 * PI;
-			w_z = -141.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
+			w_z = -115.0f * gyro_z_raw / 32768.0 * 2000.0 / 180.0 * PI;
 			if(fabs(w_x) < 0.2) w_x = 0.0f;
 			if(fabs(w_y) < 0.2) w_y = 0.0f;
 			if(fabs(w_z) < 0.2) w_z = 0.0f;
@@ -390,10 +393,10 @@ void SensorInitial(u8 type)
 void AHRS_iteration(u8 type)
 {
 	//*******************************???¡¥¡ä¡ã?¨²??2¡§*******************************************************//
-	u8 j = 0, k = 0;
+	u8 j = 0;
 	float norm = 0.0f, sum = 0.0f;
 	u8 flag = type;
-	float q0q0 = 0.0, q0q1 = 0.0, q0q2 = 0.0, q0q3 = 0.0, q1q1 = 0.0, q1q2 = 0.0, 
+	float q0q1 = 0.0, q0q2 = 0.0, q0q3 = 0.0, q1q1 = 0.0, q1q2 = 0.0, 
 				q1q3 = 0.0, q2q2 = 0.0, q2q3 = 0.0, q3q3 = 0.0; 
 	
 	t1 = micros();
@@ -420,8 +423,8 @@ void AHRS_iteration(u8 type)
 		{
 			sum += buffer1[j];
 		}
-		gyro_x = fabs(fabs(sum / 6.0f) - fabs(w_x_bias));
-		if(sum < 0) gyro_x = -gyro_x;
+		gyro_x = sum / 6.0f - w_x_bias;
+		//if(sum < 0) gyro_x = -gyro_x;
 		//gyro_x = (sum / 6.0f) - w_x_bias * 0.5;
 		//gyro_x = sum / 6.0f;
 		//low_pass filter
@@ -433,8 +436,8 @@ void AHRS_iteration(u8 type)
 		{
 			sum += buffer2[j];
 		}
-		gyro_y = fabs(fabs(sum / 6.0f) - fabs(w_y_bias));
-		if(sum < 0) gyro_y = -gyro_y;
+		gyro_y = sum / 6.0f - w_y_bias;
+		//if(sum < 0) gyro_y = -gyro_y;
 		//gyro_y = (sum / 6.0f) - w_y_bias * 0.5;
 		//gyro_y = sum / 6.0f;
 		/*gyro_y = gyro_y * 0.7 + gyro_y_0 * 0.3;
@@ -445,8 +448,8 @@ void AHRS_iteration(u8 type)
 		{
 			sum += buffer3[j];
 		}
-		gyro_z = fabs(fabs(sum / 6.0f) - fabs(w_z_bias));
-		if(sum < 0) gyro_z = -gyro_z;
+		gyro_z = sum / 6.0f - w_z_bias;
+		//if(sum < 0) gyro_z = -gyro_z;
 		//gyro_z = (sum / 6.0f) - w_z_bias * 0.5;
 		//gyro_z = sum / 6.0f;
 		/*gyro_z = gyro_z * 0.7 + gyro_z_0 * 0.3;
@@ -512,7 +515,7 @@ void AHRS_iteration(u8 type)
 		mag_z *= norm;
 
 		// Auxiliary variables to avoid repeated arithmetic
-		q0q0 = SEq_1 * SEq_1;
+		//q0q0 = SEq_1 * SEq_1;
 		q0q1 = SEq_1 * SEq_2;
 		q0q2 = SEq_1 * SEq_3;
 		q0q3 = SEq_1 * SEq_4;
@@ -543,16 +546,26 @@ void AHRS_iteration(u8 type)
 		//maybe ex,ey,ex is in degreen ,which should be turn into rads(since ex,ey,ez is much too huge, making w_x,w_y,w_z turnning all the time	)
 		ex = (acc_y * vz - acc_z * vy) + (mag_y * wz - mag_z * wy);
 		ey = (acc_z * vx - acc_x * vz) + (mag_z * wx - mag_x * wz);
-		ez = ((acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx)) * 0.2;
+		ez = (acc_x * vy - acc_y * vx) + (mag_x * wy - mag_y * wx);
 		/*ex = 0.0;
 		ey = 0.0;
 		ez = 0.0;*/
 		
-		
-		if(fabs(ex) < (PI / 360.0)){ex = 0.0f;}
-		if(fabs(ey) < (PI / 360.0)){ey = 0.0f;}
-		if(fabs(ez) < (PI / 360.0)){ez = 0.0f;}
-	
+		if(fabs(ex) < 0.001){ex = 0.0f;}
+		if(fabs(ey) < 0.001){ey = 0.0f;}
+		if(fabs(ez) < 0.001){ez = 0.0f;}
+
+		dex = ex - pex;
+		dey = ey - pey;
+		dez = ez - pez;
+
+		pex = ex;
+		pey = ey;
+		pez = ez;
+
+		/*dex *= twoKd_x;
+		dey *= twoKd_y;
+		dez *= twoKd_z;*/
 		// Compute and apply integral feedback if enabled(¨®?2?3??¨®2?PIDT?y¨ª¨®?Y¨°?)
 		if(ex != 0.0f && ey != 0.0f && ez != 0.0f) 
 		{
@@ -575,6 +588,11 @@ void AHRS_iteration(u8 type)
 		gyro_x += twoKp_x * ex;
 		gyro_y += twoKp_y * ey;
 		gyro_z += twoKp_z * ez;
+
+		// Apply  Derivative feedback
+		gyro_x += twoKd_x * dex;
+		gyro_y += twoKd_y * dey;
+		gyro_z += twoKd_z * dez;
 	
 		gyro_x_f = gyro_x;
 		gyro_y_f = gyro_y;
@@ -607,9 +625,23 @@ void AHRS_iteration(u8 type)
 
 void AHRS_computeEuler(void)
 {
-		pitch = -1.0f * asin(-2*SEq_2*SEq_4 + 2*SEq_1*SEq_3) / PI * 180.0;	 
+	u8 ack_frame[8];
+	//u8 i = 0;
+	pitch = -1.0f * asin(-2*SEq_2*SEq_4 + 2*SEq_1*SEq_3) / PI * 180.0;	 
     roll  = atan2(2*SEq_3*SEq_4 + 2*SEq_1*SEq_2,-2*SEq_2*SEq_2 - 2*SEq_3*SEq_3 + 1) / PI * 180;
   	yaw   = atan2(2*SEq_2*SEq_3 + 2*SEq_1*SEq_4,-2*SEq_3*SEq_3 - 2*SEq_4*SEq_4 + 1) / PI * 180;
+
+	//sprintf(ack_frame,"%f",yaw);
+	//USART2WriteDataToBuffer(ack_frame, 7);
+	//sprintf(ack_frame,"%c",',');
+	//USART2WriteDataToBuffer(ack_frame, 1);
+	/*i++;
+	if(i == 16)
+	{
+		i = 0;
+		sprintf(ack_frame,"%c",'\r');
+	  USART2WriteDataToBuffer(ack_frame, 1);
+	}*/
 }
 
 
