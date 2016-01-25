@@ -1,0 +1,95 @@
+前进
+55 aa 1e 01 03 a1 01 30 2d
+55 aa 1e 01 03 a1 01 20 3d
+后退
+55 aa 1e 01 03 a1 02 30 2c
+55 aa 1e 01 03 a1 02 20 3c
+左移
+55 aa 1e 01 03 a1 03 30 2b
+右移
+55 aa 1e 01 03 a1 04 30 2a
+停止
+55 aa 1e 01 01 a2 5d
+
+读角度
+55 aa 1e 01 01 1a e5
+106.3
+
+停止
+55 aa 1e 01 01 1c e3
+
+无目的旋转
+55 aa 1e 01 02 1d 速度 校验
+停止无目的旋转
+55 aa 1e 01 01 1e e1
+
+目标旋转
+55 aa 1e 01 03 20 高位 低位 校验
+55 aa 1e 01 03 20 00 00 df  0
+55 aa 1e 01 03 20 02 58 85  60
+55 aa 1e 01 03 20 01 2c b2  30
+55 aa 1e 01 03 20 07 08 ef  180
+
+55 aa 1e 01 03 20 06 68 71	164
+55 aa 1e 01 03 20 4b 00 94	120
+55 aa 1e 01 03 20 00 22 bd  3.4
+55 aa 1e 01 03 20 01 54 8a  34
+
+停止目标旋转
+55 aa 1e 01 01 21 de
+
+步进旋转
+55 aa 1e 01 03 40 00 64 5b 正10度
+55 aa 1e 01 03 40 00 9c 23 负10度
+
+停止
+55 aa 1e 01 01 21 de
+
+
+pid参数调节
+55 aa 1e 01 04 30 pp ii dd 校验
+55 aa 1e 01 04 30 05 00 00 ca
+55 aa 1e 01 04 30 05 01 00 c9
+
+AHRS pid参数调节
+55 aa 1e 01 04 31 pp ii dd 校验
+
+55 aa 1e 01 04 31 01 00 00 cd
+55 aa 1e 01 04 31 48 0a 00 7c
+55 aa 1e 01 04 31 48 00 00 86
+55 aa 1e 01 04 31 48 0a 00 7b
+55 aa 1e 01 04 31 48 0a 0a 72
+55 aa 1e 01 04 31 1e 00 00 b0
+
+55 aa 1e 01 04 31 14 0a 00 b0
+55 aa 1e 01 04 31 0c 0a 00 b0
+55 aa 1e 01 04 31 64 14 00 56
+
+55 aa 1e 01 02 1d 04 DE
+
+55 aa 1e 01 02 1d 10 D2
+
+
+plot3(handles.zxdata,handles.zydata,handles.zzdata,'r-.');
+plot3(handles.yxdata,handles.yydata,handles.yzdata,'b-.');
+plot3(handles.xxdata,handles.xydata,handles.xzdata,'c-.');
+
+
+f1 =
+ 
+- m_x - 2*b_z*(q0*q2 - q1*q3) - 2*b_x*(q2^2 + q3^2 - 1/2)
+f2 =
+ 
+2*b_x*(q0*q3 - q1*q2) - m_y - 2*b_z*(q0*q1 + q2*q3)
+f3 =
+ 
+2*b_x*(q0*q2 + q1*q3) - m_z - 2*b_z*(q1^2 + q2^2 - 1/2)
+f4 =
+ 
+2*q0*q2 - a_x - 2*q1*q3
+f5 =
+ 
+2*q0*q1 - a_y + 2*q2*q3
+f6 =
+ 
+- 2*q1^2 - 2*q2^2 - a_z + 1
