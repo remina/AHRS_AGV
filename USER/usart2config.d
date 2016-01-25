@@ -2,7 +2,7 @@ usart2config.o: USART2Config.c
 usart2config.o: USART2Config.h
 usart2config.o: ..\CMSIS\stm32f10x.h
 usart2config.o: ..\CMSIS\core_cm3.h
-usart2config.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+usart2config.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 usart2config.o: ..\CMSIS\system_stm32f10x.h
 usart2config.o: ..\USER\stm32f10x_conf.h
 usart2config.o: ..\FWlib\inc\stm32f10x_adc.h
@@ -35,5 +35,5 @@ usart2config.o: OSQMem.h
 usart2config.o: MotorControl.h
 usart2config.o: global.h
 usart2config.o: MotorControl.h
-usart2config.o: D:\Keil\ARM\ARMCC\bin\..\include\stdio.h
-usart2config.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h
+usart2config.o: d:\Keil\ARM\ARMCC\bin\..\include\stdio.h
+usart2config.o: d:\Keil\ARM\ARMCC\bin\..\include\math.h

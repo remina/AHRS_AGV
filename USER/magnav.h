@@ -5,6 +5,7 @@
 
 typedef struct {
 	float kp;
+	float ki;
 	float kd;
 } K_PD;
 

@@ -66,7 +66,7 @@ int main(void)
 	WheelSpeed wheelspeed;
 
   	SystemInit();
-	//配置波特率
+	//?????
 	USART1_Init(115200);
 	USART2_Init(115200);
 	USART3_Init(38400);
@@ -74,8 +74,8 @@ int main(void)
 
 	CAN1_Init();
 	LED_Init();
+//	TIM2_Init();
 	TIM3_Init();
-	TIM2_Init();
 	SysTick_Init();
 	Motor_init();	  
 	amp_init();
@@ -83,8 +83,7 @@ int main(void)
 	flash_init();
 
     DelayMs(1000);	   //Time for Motor Driver Board to init
-		DelayMs(1000);
-		
+
 	set_all_speedctl();
 	t3 = micros();
 	//*************************initial sensor***************************************************************//
@@ -108,15 +107,15 @@ int main(void)
 		}
 	
 	}
-		sch_init();
-//	sch_add_task(sensors, 6, 20);
-		sch_add_task(AHRS_compute, 1, 50);
+	sch_init();
+	sch_add_task(sensors, 6, 20);
+	sch_add_task(AHRS_compute, 1, 50);
 //	sch_add_task(led_task, 4, 100);
-//	sch_add_task(UART2Proc, 10, 20);
+	sch_add_task(UART2Proc, 10, 20);
 //  sch_add_task(UART3Proc, 3, 20);
 //	sch_add_task(UART3Proc, 4, 20);
 //	sch_add_task(FRIDCheck, 2, 20);
-		sch_start();
+	sch_start();
 
 		while (1)
 		{
@@ -125,4 +124,4 @@ int main(void)
 		}
 
 }
-/******************* (C) 版权所有 武汉汉迪机器人科技有限公司 *****END OF FILE****/
+/******************* (C) ???? ????????????? *****END OF FILE****/

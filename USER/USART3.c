@@ -13,7 +13,7 @@
 #include "magnav.h"
 #include "UART4.h"
 #include "odometry.h"
-
+#include "AHRS.h"
 #include "sensors.h"
 #include "FLASH.h"
 
@@ -102,6 +102,7 @@ u8 g_magnav_action_flag = FALSE;
 u8 g_dir;
 RobotRate g_zigbee_manual_botrate = {0.0, 0.0, 0.0};
 float g_magnav_auto_botrate = 0.0;
+float hold_yaw;
 
 u8  back_and_turn(float speed, u8 from, u8 to);
 u8  strafe_block(float speed, u8 from, u8 to);
@@ -672,25 +673,6 @@ static void CommandProcess(void)
 			break;
 		case RFID_CMD:
 		    break;
-		case MAG_SENSOR_CMD:
-			mag_sensor_read(FRONT, mag_sensor_status);
-			mag_sensor_data[0] = mag_status_to_data(mag_sensor_status, 8);
-			mag_sensor_read(BACK, mag_sensor_status);
-			mag_sensor_data[1] = mag_status_to_data(mag_sensor_status, 8);
-			mag_sensor_read(LEFT, mag_sensor_status);
-			mag_sensor_data[2] = mag_status_to_data(mag_sensor_status, 8);
-			mag_sensor_read(RIGHT, mag_sensor_status);
-			mag_sensor_data[3] = mag_status_to_data(mag_sensor_status, 8);
-
-			for(i=0;i<4;i++)
-			{
-				if(mag_sensor_data[i]==0)	mag_sensor_data[i]=0xA8;//10101000b;
-				else if(mag_sensor_data[i]==0xFF)	mag_sensor_data[i]=0x54;//01010100b;
-			}
-
-			ack_frame_data_len = make_frame(frame_type, cmd_type, mag_sensor_data, 4, ack_frame);
-			USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);
-								
 			break;
 		case STATE_CMD:
 			ack_frame_data_len = make_frame(frame_type, cmd_type, 0, 0, ack_frame);
@@ -710,7 +692,7 @@ static void CommandProcess(void)
 
 		switch (cmd_type)
 		{
-			case TURN_AND_GO_CMD:
+			/*case TURN_AND_GO_CMD:
 //				ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
 //				USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);
 
@@ -739,7 +721,7 @@ static void CommandProcess(void)
 				{
 					//error
 				}
-				break;
+				break;*/
 			case STRAFE_BLOCK_CMD:
 //				ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
 //				USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);
@@ -747,40 +729,16 @@ static void CommandProcess(void)
 				g_dir = value;
 				value = USART3RecvBuffer[USART3RecvBufStart+3];
 				g_magnav_auto_botrate = value_to_speed(value);
-				value = USART3RecvBuffer[USART3RecvBufStart+4];
-				g_from = value;
-				value = USART3RecvBuffer[USART3RecvBufStart+5];
-				g_to = value;
 //				strafe_block(speed_temp, from, to);
 				if (g_magnav_auto_botrate >= 400)
 					break;
-				if (g_from < 1 || g_from > 16)
-					break;
-				if (g_to < 1 || g_to > 16)
-					break;
-				if (g_dir == LEFT && g_from > g_to)
-				{
-					g_magnav_action_flag = TRUE;
-					g_distance = 0;
-					ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
-					USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);				
-				}
-				else if (g_dir == RIGHT && g_from < g_to)
-				{
-					g_magnav_action_flag = TRUE;
-					g_distance = 0;
-					ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
-					USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);					
-				}
-				else
-				{
-					//error
-				    USART3WriteDataToBuffer(error_code2, 5);
-//					g_magnav_action_flag = FALSE;
-//					g_magnav_auto_botrate = 0.0;
-				}
+				hold_yaw = yaw;
+				g_magnav_action_flag = TRUE;
+				g_distance = 0;
+				ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
+				USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);				
 				break;
-			case BACK_AND_TURN_CMD:
+/*			case BACK_AND_TURN_CMD:
 //				ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
 //				USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);
 				value = USART3RecvBuffer[USART3RecvBufStart+2];
@@ -812,8 +770,8 @@ static void CommandProcess(void)
 //					g_magnav_action_flag = FALSE;
 //					g_magnav_auto_botrate = 0.0;
 				}
-				break;
-			case BACK_AND_STOP_CMD:
+				break;*/
+/*			case BACK_AND_STOP_CMD:
 //				ack_frame_data_len = make_frame(frame_type, cmd_type, USART3RecvBuffer+USART3RecvBufStart+2, 4, ack_frame);
 //				USART3WriteDataToBuffer(ack_frame, ack_frame_data_len);
 				value = USART3RecvBuffer[USART3RecvBufStart+2];
@@ -846,7 +804,7 @@ static void CommandProcess(void)
 //					g_magnav_action_flag = FALSE;
 //					g_magnav_auto_botrate = 0.0;
 				}
-				break;
+				break;*/
 			case STOP_CMD:
 				stop_base();
 

@@ -1,7 +1,7 @@
 sensors.o: sensors.c
 sensors.o: ..\CMSIS\stm32f10x.h
 sensors.o: ..\CMSIS\core_cm3.h
-sensors.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+sensors.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 sensors.o: ..\CMSIS\system_stm32f10x.h
 sensors.o: ..\USER\stm32f10x_conf.h
 sensors.o: ..\FWlib\inc\stm32f10x_adc.h
@@ -39,8 +39,8 @@ sensors.o: OSQMem.h
 sensors.o: USART2.h
 sensors.o: USART2Config.h
 sensors.o: USART2.h
-sensors.o: D:\Keil\ARM\ARMCC\bin\..\include\stdio.h
-sensors.o: D:\Keil\ARM\ARMCC\bin\..\include\math.h
+sensors.o: d:\Keil\ARM\ARMCC\bin\..\include\stdio.h
+sensors.o: d:\Keil\ARM\ARMCC\bin\..\include\math.h
 sensors.o: UART4.h
 sensors.o: UART4Config.h
 sensors.o: UART4.h

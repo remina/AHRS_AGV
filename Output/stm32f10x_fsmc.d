@@ -2,7 +2,7 @@
 ..\output\stm32f10x_fsmc.o: ..\FWlib\inc\stm32f10x_fsmc.h
 ..\output\stm32f10x_fsmc.o: ..\CMSIS\stm32f10x.h
 ..\output\stm32f10x_fsmc.o: ..\CMSIS\core_cm3.h
-..\output\stm32f10x_fsmc.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+..\output\stm32f10x_fsmc.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 ..\output\stm32f10x_fsmc.o: ..\CMSIS\system_stm32f10x.h
 ..\output\stm32f10x_fsmc.o: ..\USER\stm32f10x_conf.h
 ..\output\stm32f10x_fsmc.o: ..\FWlib\inc\stm32f10x_adc.h

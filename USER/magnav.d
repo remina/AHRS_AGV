@@ -1,7 +1,7 @@
 magnav.o: magnav.c
 magnav.o: ..\CMSIS\stm32f10x.h
 magnav.o: ..\CMSIS\core_cm3.h
-magnav.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+magnav.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 magnav.o: ..\CMSIS\system_stm32f10x.h
 magnav.o: ..\USER\stm32f10x_conf.h
 magnav.o: ..\FWlib\inc\stm32f10x_adc.h

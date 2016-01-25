@@ -11,6 +11,9 @@
 *******************************************************************************/
 #include "USART2.h"
 #include "global.h"
+#include "odometry.h"
+#include "AHRS.h"
+#include "sensors.h"
 
 u8 USART2SendQBoxHost;						//发送内存块头指针							
 u8 USART2SendQBoxTail;						//发送内存块尾指针
@@ -41,16 +44,22 @@ OSMEMTcb* OSQUSART2Index;
 #define START_RCV            1
 #define FIRST_FRAMEHEADER    0x55
 #define SENCOND_FRAMEHEADER  0xAA
-#define  BUTCONMODE    0xA1
-#define  DISCONMODE    0xA2
-#define  COORDCONMODE  0xA3
-#define  DEMOMODE      0xA4
-#define  MY_ADDR       0x1E
+#define	BUTCONMODE    0xA1
+#define	DISCONMODE    0xA2
+#define	COORDCONMODE  0xA3
+#define	DEMOMODE      0xA4
+#define	MY_ADDR       0x1E
+#define	MYYAW					0x1A
+#define	TEST					0x1B
+#define STOP_TEST			0x1C
 int ucTranslateRate[3], ucAngle[3], ucRotateRate[3];
 u8  rateIndex = 0;
 
-RobotRate g_bt_manual_botrate;
-u8 g_bt_manual_flag;
+float g_bt_manual_botrate = 0.0;
+u8 g_bt_manual_flag = 0;
+
+extern float value_to_speed(u8 value);
+extern float hold_yaw;
 
 //错误定义
 #define ERR_NO_SPACE	0xff
@@ -243,8 +252,12 @@ static void CommandProcess(void)
 {
 //	int ucTranslateRate, ucAngle, ucRotateRate;
 //	static u8 sensorflag = OPENSENSOR; 
-	u8 ucCommand, j;
+	u8 ucCommand, j, value;
 	RobotRate	robotrate;
+	extern u8 g_dir;
+	extern u8 test_flag;
+	u8 ack_frame[8];
+
 //	WheelSpeed  realspeed;
 
 	ucCommand = USART2RecvBuffer[USART2RecvBufStart];
@@ -252,7 +265,7 @@ static void CommandProcess(void)
 	switch (ucCommand) 		//方向控制模式
 	{
 	case BUTCONMODE:
-		j = (USART2RecvBufStart + 1);
+		/*j = (USART2RecvBufStart + 1);
 		ucTranslateRate[rateIndex] = GetIntData(j);	 //速度大小
 		j = (USART2RecvBufStart + 3);
 		ucAngle[rateIndex] = GetIntData(j);		     //方向
@@ -280,21 +293,50 @@ static void CommandProcess(void)
 				
 //		realspeed = ComputeEachWheelSpeed(robotrate);
 //		SendCmdToMotorDriver(realspeed);
-		g_bt_manual_botrate = robotrate;
-
+		g_bt_manual_botrate = robotrate;*/
+		
+		value = USART2RecvBuffer[USART2RecvBufStart + 1];
+		g_dir = value;
+		value = USART2RecvBuffer[USART2RecvBufStart+2];
+		g_bt_manual_botrate = value_to_speed(value);
+//				strafe_block(speed_temp, from, to);
+		if (g_bt_manual_botrate >= 400)
+			break;
+		hold_yaw = yaw;
+		g_bt_manual_flag = TRUE;
+		g_distance = 0;
 		break;
 	case DISCONMODE:   
 		//autoflag =1;		
+		stop_base();
+		g_bt_manual_flag = FALSE;
+		g_distance = 0;
+		g_bt_manual_botrate = 0;
 		break;
-    case COORDCONMODE:	 //	目标点控制模式  行走距离控制模式
+	case COORDCONMODE:	 //	目标点控制模式  行走距离控制模式
 //		sensorflag = OPENSENSOR;
 		//autoflag=1;	
 //		RobotAutonomously(); 
 		break;
-    case DEMOMODE:	     //演示模式
+	case DEMOMODE:	     //演示模式
 //		sensorflag = CLOSESENSOR;
 		break;
-//  case SONARVAL:
+	case MYYAW:
+		ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
+		ack_frame[1] = ((s16)(yaw *10)) & 0xFF;
+		USART2WriteDataToBuffer(ack_frame, 2);
+		break;
+	case TEST:
+		test_flag = 1;
+		value = USART2RecvBuffer[USART2RecvBufStart + 1];
+		g_bt_manual_botrate = value_to_speed(value);
+		break;
+	case STOP_TEST:
+		stop_base();
+		test_flag = 0;
+		g_bt_manual_botrate = 0;
+		break;
+// case SONARVAL:
 //      j = (UART4RecvBufStart + 1) & (MAX_RCV_BYTES - 1);
 //      for(i = 0; i < MAX_SONAR_NUM; i++) {
 //        ga_ucDisData[i] = UART4RecvBuffer[j];
@@ -313,28 +355,28 @@ int USART2CheckDataFrame(void)
   while (USART2RecvPtrR != USART2RecvPtrW) 
   {
     if (USART2RecvState == NO_START_RCV) 
-	{
+		{
       k = 0;
       i = (USART2RecvPtrR - 5);
       if (USART2RecvBuffer[i] == FIRST_FRAMEHEADER) 
-	  {
+			{
         k++;
       }
       
       i = (USART2RecvPtrR - 4);
       if (USART2RecvBuffer[i] == SENCOND_FRAMEHEADER) 
-	  {
+			{
         k++;
       }
       
-	  i = (USART2RecvPtrR - 3);
-	  if (USART2RecvBuffer[i] == MY_ADDR)
-	  {
-	  	k++;
-	  }
+			i = (USART2RecvPtrR - 3);
+			if (USART2RecvBuffer[i] == MY_ADDR)
+			{
+				k++;
+			}
 
       if (k == 3) 
-	  {
+			{
         //获取有效数据的起始地址和末尾地址（末尾地址指向整个数据帧的帧尾，校验和）
         USART2RecvState = START_RCV;
         i = (USART2RecvPtrR - 1);
@@ -343,26 +385,26 @@ int USART2CheckDataFrame(void)
         USART2RecvBufEnd = (USART2RecvPtrR + USART2RecvFrameLen);
       }      
     } 
-	else 
-	{
+		else 
+		{
       //开始接收数据处理
       if(USART2RecvPtrR == USART2RecvBufEnd) 
-	  {
+			{
         //数据帧接收完
         USART2RecvState = NO_START_RCV;
         
         j = USART2RecvBufStart;
         k = 0;
         for(i = 0; i < USART2RecvFrameLen; i++) 
-		{
+				{
           k += USART2RecvBuffer[j];
          
           j = (j + 1);
         }
-//		USART1WriteDataToBuffer(USART2RecvBuffer + USART2RecvBufStart, USART2RecvFrameLen);
+//			USART1WriteDataToBuffer(USART2RecvBuffer + USART2RecvBufStart, USART2RecvFrameLen);
         k = ~k;
         if(k == USART2RecvBuffer[j]) 
-		{
+				{
           flag = USART2RecvBuffer[USART2RecvBufStart];
         }
       }

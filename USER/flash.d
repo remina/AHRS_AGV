@@ -1,7 +1,7 @@
 flash.o: FLASH.c
 flash.o: ..\CMSIS\stm32f10x.h
 flash.o: ..\CMSIS\core_cm3.h
-flash.o: D:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+flash.o: d:\Keil\ARM\ARMCC\bin\..\include\stdint.h
 flash.o: ..\CMSIS\system_stm32f10x.h
 flash.o: ..\USER\stm32f10x_conf.h
 flash.o: ..\FWlib\inc\stm32f10x_adc.h
@@ -35,4 +35,4 @@ flash.o: magnav.h
 flash.o: MotorControl.h
 flash.o: global.h
 flash.o: MotorControl.h
-flash.o: D:\Keil\ARM\ARMCC\bin\..\include\string.h
+flash.o: d:\Keil\ARM\ARMCC\bin\..\include\string.h
