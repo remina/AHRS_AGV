@@ -24,7 +24,7 @@ float SEq_1 = 1.0f, SEq_2 = 0.0f, SEq_3 = 0.0f, SEq_4 = 0.0f;
 //float SEq_1_n = 1.0f, SEq_2_n = 0.0f, SEq_3_n = 0.0f, SEq_4_n = 0.0f;     //用于构造梯形结构解微分方程
 
 
-float twoKp_z = 150.0f, twoKp_x = 150.0, twoKp_y = 150.0, twoKi_z = 1.0, twoKi_x = 1.0, twoKi_y = 1.0, twoKd_x = 0.0, twoKd_y = 0.0, twoKd_z = 0.0;
+float twoKp_z = 260.0f, twoKp_x = 260.0, twoKp_y = 260.0, twoKi_z = 10.0, twoKi_x = 10.0, twoKi_y = 10.0, twoKd_x = 0.0, twoKd_y = 0.0, twoKd_z = 0.0;
 float vx = 0.0f, vy = 0.0f, vz = 0.0f, wx = 0.0f, wy = 0.0f, wz = 0.0f;
 static char cut_count;
 float roll = 0.0f, pitch = 0.0f, yaw = 0.0f;

@@ -3,7 +3,7 @@
 <title>Static Call Graph - [..\Output\STM32-DEMO.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image ..\Output\STM32-DEMO.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 76]: Last Updated: Tue Dec 29 11:22:29 2015
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 76]: Last Updated: Tue Dec 29 16:23:01 2015
 <BR><P>
 <H3>Maximum Stack Usage =        384 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -898,7 +898,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f10x_hd.o(RESET)
 </UL>
-<P><STRONG><a name="[5a]"></a>mag_sensor_init</STRONG> (Thumb, 222 bytes, Stack size 8 bytes, magnav.o(.text))
+<P><STRONG><a name="[5a]"></a>mag_sensor_init</STRONG> (Thumb, 220 bytes, Stack size 8 bytes, magnav.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = mag_sensor_init &rArr; GPIO_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_APB2PeriphClockCmd
@@ -907,7 +907,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[46]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[db]"></a>pid_cal</STRONG> (Thumb, 302 bytes, Stack size 56 bytes, magnav.o(.text))
+<P><STRONG><a name="[db]"></a>pid_cal</STRONG> (Thumb, 298 bytes, Stack size 56 bytes, magnav.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = pid_cal &rArr; __aeabi_fsub &rArr; __aeabi_fadd &rArr; _float_epilogue
 </UL>
 <BR>[Calls]<UL><LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cfcmpeq
@@ -2714,7 +2714,7 @@ Global Symbols
 <H3>
 Local Symbols
 </H3>
-<P><STRONG><a name="[d2]"></a>CommandProcess</STRONG> (Thumb, 1046 bytes, Stack size 48 bytes, usart2.o(.text))
+<P><STRONG><a name="[d2]"></a>CommandProcess</STRONG> (Thumb, 994 bytes, Stack size 48 bytes, usart2.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 192<LI>Call Chain = CommandProcess &rArr; stop_base &rArr; set_motorspeed &rArr; CAN1WriteDataToBuffer &rArr; CAN1SendUpdate &rArr; CAN1SendByte &rArr; CAN_Transmit
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;value_to_speed
