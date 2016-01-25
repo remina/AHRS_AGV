@@ -1,0 +1,6 @@
+---- sch_update Matches (5 in 3 files) ----
+STM32-DEMO.htm (output):<BR>[Calls]<UL><LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sch_update
+STM32-DEMO.htm (output):<P><STRONG><a name="[64]"></a>sch_update</STRONG> (Thumb, 114 bytes, Stack size 0 bytes, task.o(.text))
+Stm32f10x_it.c (user):	extern void sch_update(void);
+Stm32f10x_it.c (user): 	sch_update();
+Task.c (user):void sch_update(void)
