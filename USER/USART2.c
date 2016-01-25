@@ -69,7 +69,7 @@ u8 g_bt_manual_flag = 0;
 
 extern float value_to_speed(u8 value);
 extern float hold_yaw;
-
+extern float interval;
 //´íÎó¶¨Òå
 #define ERR_NO_SPACE	0xff
 
@@ -275,7 +275,6 @@ static void CommandProcess(void)
 	extern float twoKi_x;
 	extern float twoKp_y;
 	extern float twoKi_y;
-	extern float interval;
 	extern float ex;
 	extern float ey;
 	extern float ez;	
@@ -345,7 +344,7 @@ static void CommandProcess(void)
 //		sensorflag = CLOSESENSOR;
 		break;
 	case MYYAW:
-/*ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
+		/*ack_frame[0] = (((s16)(yaw *10)) >> 8) & 0xFF;
 		ack_frame[1] = ((s16)(yaw *10)) & 0xFF;*/
 		sprintf(ack_frame,"%s"," yaw=");
 		USART2WriteDataToBuffer(ack_frame, 5);

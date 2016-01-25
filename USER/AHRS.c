@@ -12,10 +12,13 @@
 bool cut_off = false;
 u8 rawdata[11] = {0};
 float gyro_x_f = 0.0f, gyro_y_f = 0.0f, gyro_z_f = 0.0f; 
-float b_x = -1.0f, b_z = 0.0f;
+float b_x = -1.0f, b_y = 0.0f, b_z = 0.0f;
 float h_x = -1.0f, h_y = 0.0f, h_z = 0.0f;
 
 qua SEq = {1.0, 0.0, 0.0, 0.0};
+qua acc_q = {1.0, 0.0, 0.0, 0.0};
+qua mag_q = {1.0, 0.0, 0.0, 0.0};
+qua a_m_q = {1.0, 0.0, 0.0, 0.0};
 raw_data data_first = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 raw1_data data_second = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 sensor_data s_data = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -83,6 +86,48 @@ void norm(float *x, float *y, float *z)
 	*x *= norm;
 	*y *= norm;
 	*z *= norm;
+}
+
+void vector2qua(float from_x, float from_y, float from_z, float to_x, float to_y, float to_z, qua *q)
+{
+	float norm_from = invSqrt(from_x * from_x + from_y * from_y + from_z * from_z);
+	float norm_to = invSqrt(to_x * to_x + to_y * to_y + to_z * to_z);
+	float cos_theta = (from_x * to_x + from_y * to_y + from_z * to_z) * norm_from * norm_to;
+	//float cos_halftheta = sqrt((1 + cos_theta)/2.0);
+	float sin_halftheta = sqrt((1 - cos_theta)/2.0);
+
+	float cross_x = from_y * to_z - from_z * to_y;
+	float cross_y = from_z * to_x - from_x * to_z;
+	float cross_z = from_x * to_y - from_y * to_x;
+
+	norm(&cross_x, &cross_y, &cross_z);
+
+	q->q0 = sqrt((1 + cos_theta)/2.0);
+	q->q1 = cross_x * sin_halftheta;
+	q->q2 = cross_y * sin_halftheta;
+	q->q3 = cross_z * sin_halftheta;
+}
+
+void vector_corss(float from_x, float from_y, float from_z, float to_x, float to_y, float to_z, float *out_x, float *out_y, float *out_z)
+{
+	*out_x = from_y * to_z - from_z * to_y;
+	*out_y = from_z * to_x - from_x * to_z;
+	*out_z = from_x * to_y - from_y * to_x;
+}
+
+void vector_add(float from_x, float from_y, float from_z, float to_x, float to_y, float to_z, float *out_x, float *out_y, float *out_z)
+{
+	*out_x = from_x + to_x;
+	*out_y = from_y + to_y;
+	*out_z = from_z + to_z;
+}
+
+void qua_multiply(qua *from, qua *to, qua *out)
+{
+	out->q0 = from->q0 * to->q0 - from->q1 * to->q1 - from->q2 * to->q2 - from->q3 * to->q3;
+	out->q1 = from->q0 * to->q1 + from->q1 * to->q0 + from->q2 * to->q3 - from->q3 * to->q2;
+	out->q2 = from->q0 * to->q2 + from->q2 * to->q0 + from->q3 * to->q1 - from->q1 * to->q3;
+	out->q3 = from->q0 * to->q3 + from->q3 * to->q0 + from->q1 * to->q2 - from->q2 * to->q1;
 }
 
 //************************************AHRS raw data fream checking*********************//
@@ -217,7 +262,6 @@ void SensorInitial(u8 type, qua *q)
 	float sum = 0.0f;
 	u8 j = 0;
 	
-	
 	if(flag == ACC_METER || flag == GYRO || flag == ANGLE_OUTPUT || flag == MAG_METER)
 	{		
 		if(!qua_init)
@@ -340,7 +384,7 @@ void SensorInitial(u8 type, qua *q)
 			// normacclise the maccgnetometer meaccsurement
 			norm(&m_x_bias, &m_y_bias, &m_z_bias);
 			
-			roll = atan2(a_y_bias, a_z_bias);
+			roll = PI - fabs(atan2(a_y_bias, a_z_bias));
 			pitch = asin(a_x_bias);              
 			m_x_t = m_x_bias * cos(roll) + m_y_bias * sin(roll) * sin(pitch) - m_z_bias * sin(roll) * cos(pitch);
 			m_y_t = m_y_bias * cos(pitch) + m_z_bias * sin(pitch);
@@ -547,8 +591,7 @@ void AHRS_iteration(u8 type, qua *q, sensor_data *s)
 
 			// normacclise the maccgnetometer meaccsurement
 			norm(&(s->mag_x), &(s->mag_y), &(s->mag_z));
-
-			
+		
 			// Auxiliary variables to avoid repeated arithmetic
 			q0q1 = q->q0 * q->q1;
 			q0q2 = q->q0 * q->q2;
@@ -559,22 +602,21 @@ void AHRS_iteration(u8 type, qua *q, sensor_data *s)
 			q2q2 = q->q2 * q->q2;
 			q2q3 = q->q2 * q->q3;
 			q3q3 = q->q3 * q->q3; 
-
-			
+	
 			// Reference direction of Earth's magnetic field
 			h_x = 2.0f * (s->mag_x * (0.5f - q2q2 - q3q3) + s->mag_y * (q1q2 - q0q3) + s->mag_z * (q1q3 + q0q2));
 			h_y = 2.0f * (s->mag_x * (q1q2 + q0q3) + s->mag_y * (0.5f - q1q1 - q3q3) + s->mag_z * (q2q3 - q0q1));
-			b_x = (float)(sqrt((h_x * h_x) + (h_y * h_y))) * -1.0f;
-			b_z = -2.0f * (s->mag_x * (q1q3 - q0q2) + s->mag_y * (q2q3 + q0q1) + s->mag_z * (0.5f - q1q1 - q2q2));
+			b_x = (float)(sqrt((h_x * h_x) + (h_y * h_y)));
+			b_z = 2.0f * (s->mag_x * (q1q3 - q0q2) + s->mag_y * (q2q3 + q0q1) + s->mag_z * (0.5f - q1q1 - q2q2));
 			
 			// Estimated direction of gravity 
 			vx = 2.0 * (q1q3 - q0q2) * -1.0f;
 			vy = 2.0 * (q0q1 + q2q3) ;
 			vz = 2.0 * (0.5f - q1q1 - q2q2);
 			// Estimated direction of magnetic 
-			wx =  2.0 * (b_x * (0.5f - q2q2 - q3q3) + b_z * (q1q3 - q0q2));
-			wy =  -2.0 * (b_x * (q1q2 - q0q3) - b_z * (q0q1 + q2q3));
-			wz =  2.0 * (b_x * (q0q2 + q1q3) - b_z * (0.5f - q1q1 - q2q2)); 
+			wx = -1.0f * 2.0 * (b_x * (0.5f - q2q2 - q3q3) + b_z * (q1q3 - q0q2));
+			wy =  2.0 * (b_x * (q1q2 - q0q3) + b_z * (q0q1 + q2q3));
+			wz =  2.0 * (b_x * (q0q2 + q1q3) + b_z * (0.5f - q1q1 - q2q2)); 
 			
 			// Error is sum of cross product between estimated direction and measured direction of field vectors
 			ex = (s->acc_y * vz - s->acc_z * vy) + (s->mag_y * wz - s->mag_z * wy);
@@ -613,6 +655,7 @@ void AHRS_iteration(u8 type, qua *q, sensor_data *s)
 			gyro_z_f = s->gyro_z;
 		}
 
+		//quatanion interation
 		t2 = micros();
 		if(t2 > t1)
 		{
@@ -622,8 +665,7 @@ void AHRS_iteration(u8 type, qua *q, sensor_data *s)
 		{
 			interval = (float)((total + t2 - t1) * 0.000001);
 		}
-
-		//quatanion interation	
+		
 		q->q0+= (-q->q1 * gyro_x_f - q->q2 * gyro_y_f * -1.0f - q->q3 * gyro_z_f * -1.0f) * interval / 2.0f;
 		q->q1+= (q->q0 * gyro_x_f + q->q2 * gyro_z_f * -1.0f - q->q3 * gyro_y_f * -1.0f) *  interval / 2.0f;
 		q->q2+= (q->q0 * gyro_y_f * -1.0f - q->q1 * gyro_z_f * -1.0f + q->q3 * gyro_x_f) *  interval / 2.0f;
@@ -631,41 +673,22 @@ void AHRS_iteration(u8 type, qua *q, sensor_data *s)
 
 		// Normalise quaternion
 		qua_norm(q);
-		
 	}
 }
 
-void AHRS_computeEuler(qua *q)
-{
-	pitch = -1.0f * asin(-2*q->q1*q->q3 + 2*q->q0*q->q2) / PI * 180.0;	 
-  roll  = atan2(2*q->q2*q->q3 + 2*q->q0*q->q1,-2*q->q1*q->q1 - 2*q->q2*q->q2 + 1) / PI * 180;
-	yaw   = atan2(2*q->q1*q->q2 + 2*q->q0*q->q3,-2*q->q2*q->q2 - 2*q->q3*q->q3 + 1) / PI * 180;
-}
 
-
-
-//*****************************AHRS computating task*************************************************//
-void AHRS_compute() 
-{
-  u8 flag;
-  flag = AHRSCheckDataFrame();
-  AHRS_iteration(flag, &SEq, &s_data);
-  AHRS_computeEuler(&SEq);
-}
-
-
-
-//*****************************AHRS quatanion iteration by gradian(梯度下降法)************************************************//
-/*void AHRS_iteration_gradian(u8 type, qua *q, sensor_data *s)
+//*****************************AHRS quatanion iteration by qua************************************************//
+void AHRS_iteration_qua(u8 type, qua *q, sensor_data *s)
 {
 	u8 j = 0;
 	float sum = 0.0f;
 	u8 flag = type;
+	float hx_real = 0.0, hy_real = 0.0, hz_real = 0.0,       //h为法线 
+		  cx_real = 0.0, cy_real = 0.0, cz_real = 0.0; 	 //c为对角线
+	float hx_img = 0.0, hy_img = 0.0, hz_img = 0.0,       //h为法线 
+		  cx_img = 0.0, cy_img = 0.0, cz_img = 0.0; 	 //c为对角线	
 	float q0q1 = 0.0, q0q2 = 0.0, q0q3 = 0.0, q1q1 = 0.0, q1q2 = 0.0, 
 		  q1q3 = 0.0, q2q2 = 0.0, q2q3 = 0.0, q3q3 = 0.0; 
-	float f1 = 0.0, f2 = 0.0, f3 = 0.0, f4 = 0.0, f5 = 0.0, f6 = 0.0;
-	float bzq2 = 0.0, bzq3 = 0.0, bxq2 = 0.0, bzq0 = 0.0, bzq1 = 0.0, bxq3 = 0.0, bxq1 = 0.0, bxq0 = 0.0;
-	
 	t1 = micros();
 	if(flag == ACC_METER || flag == GYRO || flag == ANGLE_OUTPUT || flag == MAG_METER)
 	{	
@@ -749,133 +772,69 @@ void AHRS_compute()
 		s->mag_z = sum / 6.0f;
 		sum = 0;
 		cal_ready = true;
-	}*/
+	}
 	
 	//**************************update quanion***************************//
-	/*if(cal_ready)
-	{ 
-		//abort adjust without MAG,only using gravity
-		if(cut_off) 
-		{
-			 //the interial calculation takes about 400ms,if need 8s to cutoff mag so, count should be 
-			cut_count++;
-			if(cut_count == 800)
-			{
-				cut_count = 0;
-				cut_off = false;
-			}				
-			else
-			{
-				norm(&(s->acc_x), &(s->acc_y), &(s->acc_z));
-			
-				// Auxiliary variables to avoid repeated arithmetic
-				q0q1 = q->q0 * q->q1;
-				q0q2 = q->q0 * q->q2;
-				q0q3 = q->q0 * q->q3;
-				q1q1 = q->q1 * q->q1;
-				q1q2 = q->q1 * q->q2;
-				q1q3 = q->q1 * q->q3;
-				q2q2 = q->q2 * q->q2;
-				q2q3 = q->q2 * q->q3;
-				q3q3 = q->q3 * q->q3; 
-			
-				// Estimated direction of gravity (????á|?òá?[0 0 0 1g]óée?μ×aμ?s?￡￡?μ?ê?′?′|ó|???a[0 0 0 -1]￡?
-				vx = 2.0 * (q1q3 - q0q2) * -1.0f;
-				vy = 2.0 * (q0q1 + q2q3);
-				vz = -2.0 * (0.5f - q1q1 - q2q2);
-			
-				// grativity error function
-				f4 = (vx - s->acc_x) * 2.0;
-				f5 = (vy - s->acc_y) * 2.0;
-				f6 = (vz - s->acc_z) * 2.0;
-				
-				//graidan (用acc_q,mag_q分别指梯度下降的方向导数和gyro角速度得到的四元数导数)
-				acc_q.q0 = q->q2 * f4 + q->q1 * f5;
-				acc_q.q1 = q->q0 * f5 - q->q3 * f4 - 2.0 * q->q1 * f6;
-				acc_q.q2 = q->q0 * f4 + q->q3 * f5 - 2.0 * q->q2 * f6;
-				acc_q.q3 = q->q2 * f5 - q->q1 * f4;
+	if(cal_ready)
+	{ 	
+		// normalise the accelerometer measurement
+		norm(&(s->acc_x), &(s->acc_y), &(s->acc_z));
 
-				qua_norm(&acc_q);
-			}
-		}
-		else   //adjust with MAG
-		{			
-			// normalise the accelerometer measurement
-			norm(&(s->acc_x), &(s->acc_y), &(s->acc_z));
+		// normacclise the maccgnetometer meaccsurement
+		norm(&(s->mag_x), &(s->mag_y), &(s->mag_z));
+			
+		// Auxiliary variables to avoid repeated arithmetic
+		q0q1 = q->q0 * q->q1;
+		q0q2 = q->q0 * q->q2;
+		q0q3 = q->q0 * q->q3;
+		q1q1 = q->q1 * q->q1;
+		q1q2 = q->q1 * q->q2;
+		q1q3 = q->q1 * q->q3;
+		q2q2 = q->q2 * q->q2;
+		q2q3 = q->q2 * q->q3;
+		q3q3 = q->q3 * q->q3; 
+			
+		// Reference direction of Earth's magnetic field
+		h_x = 2.0f * (s->mag_x * (0.5f - q2q2 - q3q3) + s->mag_y * (q1q2 - q0q3) + s->mag_z * (q1q3 + q0q2));
+		h_y = 2.0f * (s->mag_x * (q1q2 + q0q3) + s->mag_y * (0.5f - q1q1 - q3q3) + s->mag_z * (q2q3 - q0q1));
+		b_x = -1.0f* (float)(sqrt((h_x * h_x) + (h_y * h_y)));
+		b_z = -2.0f * (s->mag_x * (q1q3 - q0q2) + s->mag_y * (q2q3 + q0q1) + s->mag_z * (0.5f - q1q1 - q2q2));
+			
+		//Estimated direction of gravity(都做了归一化了，不用担心单位)
+		vx = 0.0;
+		vy = 0.0;
+		vz = -1.0;
+		// Estimated direction of magnetic(earth's) 
+		norm(&b_x, &b_y, &b_z);
 
-			// normacclise the maccgnetometer meaccsurement
-			norm(&(s->mag_x), &(s->mag_y), &(s->mag_z));
+		//计算法线和对角线 用两种acc和mag分别算h和c
+		vector_corss(vx, vy, vz, b_x, b_y, b_z, &hx_img, &hy_img, &hz_img);
+		vector_add(vx, vy, vz, b_x, b_y, b_z, &cx_img, &cy_img, &cz_img);
+		vector_corss(s->acc_x, s->acc_y, s->acc_z, s->mag_x, s->mag_y, s->mag_z, &hx_real, &hy_real, &hz_real);
+		vector_add(s->acc_x, s->acc_y, s->acc_z, s->mag_x, s->mag_y, s->mag_z, &cx_real, &cy_real, &cz_real);			
+			
+		//use (vx,vy,vz) & (b_x,b_y,b_z)as to,s->acc & s->mag as from,caculate acc_q & mag_q(因为我一直求的四元数是SEq.而非ESq)
+		vector2qua(hx_real, hy_real, hz_real, hx_img, hy_img, hz_img, &acc_q);
+		vector2qua(cx_real, cy_real, cz_real, cx_img, cy_img, cz_img, &mag_q);
 		
-			// Auxiliary variables to avoid repeated arithmetic
-			q0q1 = q->q0 * q->q1;
-			q0q2 = q->q0 * q->q2;
-			q0q3 = q->q0 * q->q3;
-			q1q1 = q->q1 * q->q1;
-			q1q2 = q->q1 * q->q2;
-			q1q3 = q->q1 * q->q3;
-			q2q2 = q->q2 * q->q2;
-			q2q3 = q->q2 * q->q3;
-			q3q3 = q->q3 * q->q3; 
-	
-			// Reference direction of Earth's magnetic field
-			h_x = 2.0f * (s->mag_x * (0.5f - q2q2 - q3q3) + s->mag_y * (q1q2 - q0q3) + s->mag_z * (q1q3 + q0q2));
-			h_y = 2.0f * (s->mag_x * (q1q2 + q0q3) + s->mag_y * (0.5f - q1q1 - q3q3) + s->mag_z * (q2q3 - q0q1));
-			b_x = (float)(sqrt((h_x * h_x) + (h_y * h_y))) * -1.0f;
-			b_z = 2.0f * (s->mag_x * (q1q3 - q0q2) + s->mag_y * (q2q3 + q0q1) + s->mag_z * (0.5f - q1q1 - q2q2));
-			
-			// Estimated direction of gravity 
-			vx = 2.0 * (q1q3 - q0q2) * -1.0f;
-			vy = 2.0 * (q0q1 + q2q3) ;
-			vz = -2.0 * (0.5f - q1q1 - q2q2);
-			// Estimated direction of magnetic 
-			wx =  2.0 * (b_x * (0.5f - q2q2 - q3q3) + b_z * (q1q3 - q0q2));
-			wy =  2.0 * (b_x * (q1q2 - q0q3) + b_z * (q0q1 + q2q3));
-			wz =  2.0 * (b_x * (q0q2 + q1q3) + b_z * (0.5f - q1q1 - q2q2)); 
-
-			//for saving time
-			bzq2 = b_z * q->q2;
-			bzq3 = b_z * q->q3;
-			bxq2 = b_x * q->q2;
-			bzq0 = b_z * q->q0;
-			bzq1 = b_z * q->q1;
-			bxq3 = b_x * q->q3;
-			bxq1 = b_x * q->q1;
-			bxq0 = b_x * q->q0;
-				
-			// Error functions
-			// mag error function
-			f1 = (wx - s->mag_x) * 2.0;
-			f2 = (wy - s->mag_y) * 2.0;
-			f3 = (wz - s->mag_z) * 2.0;
-			// grativity error function
-			f4 = (vx - s->acc_x) * 2.0;
-			f5 = (vy - s->acc_y) * 2.0;
-			f6 = (vz - s->acc_z) * 2.0;
-
-			//graidan (用acc_q,mag_q分别指梯度下降的方向导数和gyro角速度得到的四元数导数)
-			acc_q.q0 = -1.0 * bzq2 * f1 + (bxq3 - bzq1) * f2 + bxq2 * f3 + q->q2 * f4 + q->q1 * f5;
-			acc_q.q1 = bzq3 * f1 - (bxq2 + bzq0) * f2 + (bxq3 - 2.0 * bzq1) * f3 - q->q3 * f4 + q->q0 * f5 - 2.0 * q->q1 * f6;
-			acc_q.q2 = (bxq0 - 2.0 * bzq2) * f3 - (bxq1 + bzq3) * f2 - (2.0 * bxq2 + bzq0) * f1 + q->q0 * f4 + q->q3 * f5 - 2.0 * q->q2 * f6;
-			acc_q.q3 = (bzq1 - 2.0 * bxq3) * f1 + (bxq0 - bzq2) * f2 + bxq1 * f3 - q->q1 * f4 + q->q2 * f5;
-
-			qua_norm(&acc_q);
-		}
 
 		//quatanion interation
-		mag_q.q0 = q->q2 * s->gyro_y + q->q3 * s->gyro_z - q->q1 * s->gyro_x;
-		mag_q.q1 = q->q0 * s->gyro_x - q->q2 * s->gyro_z + q->q3 * s->gyro_y;
-		mag_q.q2 = q->q1 * s->gyro_z - q->q0 * s->gyro_y + q->q3 * s->gyro_x;
-		mag_q.q3 = -q->q0 * s->gyro_z * -1.0f - q->q1 * s->gyro_y - q->q2 * s->gyro_x;
-		
-		//0.0756 = 
-		q->q0 += (mag_q.q0 - acc_q.q0 * 0.00756) * interval / 2.0f;
-		q->q1 += (mag_q.q1 - acc_q.q1 * 0.00756) * interval / 2.0f;
-		q->q2 += (mag_q.q2 - acc_q.q2 * 0.00756) * interval / 2.0f;
-		q->q3 += (mag_q.q3 - acc_q.q3 * 0.00756) * interval / 2.0f; 
+		qua_multiply(&acc_q, &mag_q, &a_m_q);
+		qua_norm(&a_m_q);
+		q->q0+= (-q->q1 * gyro_x_f - q->q2 * gyro_y_f * -1.0f - q->q3 * gyro_z_f * -1.0f) * interval / 2.0f;
+		q->q1+= (q->q0 * gyro_x_f + q->q2 * gyro_z_f * -1.0f - q->q3 * gyro_y_f * -1.0f) *  interval / 2.0f;
+		q->q2+= (q->q0 * gyro_y_f * -1.0f - q->q1 * gyro_z_f * -1.0f + q->q3 * gyro_x_f) *  interval / 2.0f;
+		q->q3+= (q->q0 * gyro_z_f * -1.0f + q->q1 * gyro_y_f * -1.0f - q->q2 * gyro_x_f) *  interval / 2.0f; 
 
 		// Normalise quaternion
 		qua_norm(q);
 
+		//sensor fusing (complementary filter)暂定0.003
+		q->q0 = 0.993 * q->q0 + a_m_q.q0 * 0.007;
+		q->q1 = 0.993 * q->q1 + a_m_q.q1 * 0.007;
+		q->q2 = 0.993 * q->q2 + a_m_q.q2 * 0.007;
+		q->q3 = 0.993 * q->q3 + a_m_q.q3 * 0.007;
+		//time taken
 		t2 = micros();
 		if(t2 > t1)
 		{
@@ -886,7 +845,29 @@ void AHRS_compute()
 			interval = (float)((total + t2 - t1) * 0.000001);
 		}
 	}
-}*/
+}
+
+void AHRS_computeEuler(qua *q)
+{
+	pitch = -1.0f * asin(-2*q->q1*q->q3 + 2*q->q0*q->q2) / PI * 180.0;	 
+  roll  = atan2(2*q->q2*q->q3 + 2*q->q0*q->q1,-2*q->q1*q->q1 - 2*q->q2*q->q2 + 1) / PI * 180;
+	yaw   = atan2(2*q->q1*q->q2 + 2*q->q0*q->q3,-2*q->q2*q->q2 - 2*q->q3*q->q3 + 1) / PI * 180;
+}
+
+
+
+//*****************************AHRS computating task*************************************************//
+void AHRS_compute() 
+{
+  u8 flag;
+  flag = AHRSCheckDataFrame();
+  AHRS_iteration_qua(flag, &SEq, &s_data);
+  AHRS_computeEuler(&SEq);
+}
+
+
+
+
 
 
 

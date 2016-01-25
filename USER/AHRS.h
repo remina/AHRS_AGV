@@ -6,8 +6,8 @@
 
 //*****************************************Macros for AHRS *************************************************//
 #define FIRST_FRAMEHEADER    0x55
-#define ACC_METER    		 0x51
-#define GYRO        		 0x52
+#define ACC_METER    		 		 0x51
+#define GYRO        		 		 0x52
 #define ANGLE_OUTPUT         0x53
 #define MAG_METER            0x54
 
@@ -86,6 +86,14 @@ float invSqrt(float x) ;
 
 void qua_norm(qua *q);
 void norm(float *x, float *y, float *z);
+//********************用from to两相向量求四元数(使用前from to必须norm)*******************************************//
+void vector2qua(float from_x, float from_y, float from_z, float to_x, float to_y, float to_z, qua *q);
+//*********************两向量 from to 求from 到 to的叉乘，得到一个法线(使用前from to必须norm)*****************************//
+void vector_corss(float from_x, float from_y, float from_z, float to_x, float to_y, float to_z, float *out_x, float *out_y, float *out_z);
+//*********************两向量 from to 对角线(使用前from to必须norm)*****************************//
+void vector_add(float from_x, float from_y, float from_z, float to_x, float to_y, float to_z, float *out_x, float *out_y, float *out_z);
+//***************************四元数乘法(from 到 to from被乘)*****************************************************//
+void qua_multiply(qua *from, qua *to, qua *out);
 
 //******************************************functions for AHRS*********************************************************//
 void SensorDataProcess(u8 type, raw_data *raw, raw1_data *raw1);
@@ -93,6 +101,8 @@ float invSqrt(float x);
 u8 AHRSCheckDataFrame(void);
 void SensorInitial(u8 type, qua *q);
 void AHRS_iteration(u8 type, qua *q , sensor_data *s);
+//***********************************基于四元数的互补******************************************************//
+void AHRS_iteration_qua(u8 type, qua *q , sensor_data *s);
 void AHRS_computeEuler(qua *q);
 void AHRS_compute();
 
